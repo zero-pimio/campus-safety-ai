@@ -9,6 +9,7 @@
 - 开始：`fighting` 分数连续高于 `start_score`，覆盖时间达到 `confirm_seconds`，发出 `START`。
 - 保持：分数位于开始与结束阈值之间时保持已打开事件，但不能用来确认新事件。
 - 结束：分数连续低于 `end_score`，覆盖时间达到 `clear_seconds`，发出 `END`。
+- 收口：视频源周期结束时（断流、回放播完、重启），仍处于 OPEN 的事件必须通过 `finalize` 发出终版 `END`，不允许把悬挂事件带入新的源周期。
 - 冷却：事件结束后 `cooldown_seconds` 内不重新开始同一摄像头事件。
 - 去重：同一事件的每个 revision 使用稳定 `idempotencyKey`。
 - 时间：使用带时区的真实时间戳和视频窗口，不按帧数估算持续时间。

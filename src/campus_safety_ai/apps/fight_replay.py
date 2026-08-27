@@ -27,17 +27,26 @@ def run(input_path: Path, output_path: Path) -> int:
     analysis = default_fight_analysis()
     delivery = EventDelivery(output_path.with_suffix(".sqlite3"), JsonlDestination(output_path))
     produced = 0
-    try:
+    last_observation: BehaviorObservation | None = None
+    with delivery:
         with input_path.open(encoding="utf-8") as handle:
             for line in handle:
                 if not line.strip():
                     continue
                 observation = BehaviorObservation.from_dict(json.loads(line))
+                last_observation = observation
                 records = analysis.advance(observation)
                 produced += len(records)
                 delivery.submit(records)
-    finally:
-        delivery.close()
+        if last_observation is not None:
+            # The replay is a finished source epoch; close anything still open.
+            records = analysis.finalize(
+                last_observation.camera_id,
+                last_observation.source_epoch,
+                last_observation.observed_at,
+            )
+            produced += len(records)
+            delivery.submit(records)
     return produced
 
 

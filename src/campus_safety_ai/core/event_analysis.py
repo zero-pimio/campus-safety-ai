@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from uuid import NAMESPACE_URL, uuid5
 
 from campus_safety_ai.contracts import BBox, Detection, Detections, EventRecord, Track
@@ -157,16 +157,74 @@ class EventAnalysis:
                 if state.event_id is not None:
                     state.outside_since = state.outside_since or batch.captured_at
                     if (batch.captured_at - state.outside_since).total_seconds() >= self.policy.exit_seconds:
-                        state.revision += 1
-                        records.append(self._record(batch, track, state, "END"))
-                        from datetime import timedelta
-
-                        state.cooldown_until = batch.captured_at + timedelta(seconds=self.policy.cooldown_seconds)
-                        state.event_id = None
-                        state.started_at = None
-                        state.entered_at = None
-                        state.outside_since = None
+                        records.append(self._close(batch, track, state))
         return records
+
+    def finalize(
+        self, camera_id: str, source_epoch: int, ended_at: datetime
+    ) -> list[EventRecord]:
+        """Close every open event for one source epoch when its stream ends.
+
+        Tracks cannot survive a new source epoch (see CONTEXT.md), so a stream
+        restart or replay end must never leave an event stuck in the OPEN state.
+        """
+        prefix = f"{camera_id}:{source_epoch}:"
+        records: list[EventRecord] = []
+        for key in sorted(self._states):
+            if not key.startswith(prefix):
+                continue
+            state = self._states[key]
+            if state.event_id is None:
+                continue
+            state.revision += 1
+            records.append(
+                self._ending_record(camera_id, ended_at, key, 0.0, state)
+            )
+            state.cooldown_until = ended_at + timedelta(seconds=self.policy.cooldown_seconds)
+            state.event_id = None
+            state.started_at = None
+            state.entered_at = None
+            state.outside_since = None
+        return records
+
+    def _ending_record(
+        self,
+        camera_id: str,
+        ended_at: datetime,
+        track_key: str,
+        confidence: float,
+        state: _IntrusionState,
+    ) -> EventRecord:
+        assert state.event_id is not None and state.started_at is not None
+        return EventRecord(
+            schema_version="1.0",
+            event_id=state.event_id,
+            revision=state.revision,
+            phase="END",
+            event_type="intrusion",
+            severity="warning",
+            edge_id=self.policy.edge_id,
+            camera_id=camera_id,
+            started_at=state.started_at,
+            observed_at=ended_at,
+            ended_at=ended_at,
+            subject_track_keys=(track_key,),
+            confidence=confidence,
+            model_version="stream-finalize",
+            config_version=self.policy.config_version,
+            idempotency_key=f"{state.event_id}:{state.revision}",
+            status="CLOSED",
+        )
+
+    def _close(self, batch: Detections, track: Track, state: _IntrusionState) -> EventRecord:
+        state.revision += 1
+        record = self._record(batch, track, state, "END")
+        state.cooldown_until = batch.captured_at + timedelta(seconds=self.policy.cooldown_seconds)
+        state.event_id = None
+        state.started_at = None
+        state.entered_at = None
+        state.outside_since = None
+        return record
 
     def _record(
         self, batch: Detections, track: Track, state: _IntrusionState, phase: str

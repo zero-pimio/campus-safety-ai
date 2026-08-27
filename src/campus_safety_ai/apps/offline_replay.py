@@ -13,16 +13,24 @@ def run(input_path: Path, output_path: Path) -> int:
     analysis = default_analysis()
     delivery = EventDelivery(output_path.with_suffix(".sqlite3"), JsonlDestination(output_path))
     produced = 0
-    try:
+    last_batch: Detections | None = None
+    with delivery:
         with input_path.open(encoding="utf-8") as handle:
             for line in handle:
                 if not line.strip():
                     continue
-                records = analysis.advance(Detections.from_dict(json.loads(line)))
+                batch = Detections.from_dict(json.loads(line))
+                last_batch = batch
+                records = analysis.advance(batch)
                 produced += len(records)
                 delivery.submit(records)
-    finally:
-        delivery.close()
+        if last_batch is not None:
+            # The replay is a finished source epoch; close anything still open.
+            records = analysis.finalize(
+                last_batch.camera_id, last_batch.source_epoch, last_batch.captured_at
+            )
+            produced += len(records)
+            delivery.submit(records)
     return produced
 
 

@@ -12,7 +12,8 @@ FramePacket → Detections → Tracks → EventRecord → SQLite Outbox → Dest
 - 简单 IoU 跟踪器（首版占位，后续在 `EventAnalysis` 内替换为 ByteTrack）；
 - 使用真实时间戳的人员非法闯入状态机；
 - 归一化多边形禁区、底部中心点判定、进入/离开延时和冷却；
-- SQLite 持久 Outbox、幂等入队、JSONL/内存目标；
+- SQLite 持久 Outbox、幂等入队、分块 flush、JSONL/内存目标；
+- 视频源周期结束时的 `finalize` 收口，断流或回放播完不会留下悬挂的 OPEN 事件；
 - 固定 `Detections.jsonl` 离线回放与零依赖单元测试；
 - 可选的 Ultralytics YOLO 感知适配器。
 - 人员打架视频窗口观测契约，以及带迟滞阈值、持续确认、冷却和幂等的 START/END 状态机；

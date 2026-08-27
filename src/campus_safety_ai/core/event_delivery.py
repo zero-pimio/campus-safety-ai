@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import sqlite3
 from pathlib import Path
-from typing import Protocol
+from typing import Any, Protocol
 
 from campus_safety_ai.contracts import EventRecord
 
@@ -33,6 +33,8 @@ class JsonlDestination:
 class EventDelivery:
     """Persistent at-least-once delivery with idempotent enqueue."""
 
+    flush_chunk = 200
+
     def __init__(self, database: Path, destination: Destination) -> None:
         database.parent.mkdir(parents=True, exist_ok=True)
         self.connection = sqlite3.connect(database)
@@ -59,14 +61,20 @@ class EventDelivery:
 
     def flush(self) -> int:
         delivered = 0
-        rows = self.connection.execute(
-            "SELECT idempotency_key, payload FROM outbox WHERE delivered = 0 ORDER BY rowid"
-        ).fetchall()
-        for key, payload in rows:
-            self.destination.publish(json.loads(payload))
-            with self.connection:
-                self.connection.execute("UPDATE outbox SET delivered = 1 WHERE idempotency_key = ?", (key,))
-            delivered += 1
+        while True:
+            rows = self.connection.execute(
+                "SELECT idempotency_key, payload FROM outbox WHERE delivered = 0 ORDER BY rowid LIMIT ?",
+                (self.flush_chunk,),
+            ).fetchall()
+            if not rows:
+                break
+            for key, payload in rows:
+                self.destination.publish(json.loads(payload))
+                with self.connection:
+                    self.connection.execute(
+                        "UPDATE outbox SET delivered = 1 WHERE idempotency_key = ?", (key,)
+                    )
+                delivered += 1
         return delivered
 
     def pending_count(self) -> int:
@@ -75,4 +83,13 @@ class EventDelivery:
 
     def close(self) -> None:
         self.connection.close()
+
+    def __enter__(self) -> "EventDelivery":
+        return self
+
+    def __exit__(self, exc_type: Any, exc_value: Any, traceback: Any) -> None:
+        if exc_type is None:
+            # Drain whatever the caller produced before closing cleanly.
+            self.flush()
+        self.close()
 

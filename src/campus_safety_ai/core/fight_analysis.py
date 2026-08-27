@@ -36,6 +36,17 @@ class _FightState:
     revision: int = 0
 
 
+@dataclass(frozen=True)
+class _FinalObservation:
+    """Duck-typed observation standing in for a synthesized stream-end record."""
+
+    camera_id: str
+    source_epoch: int
+    observed_at: datetime
+    score: float = 0.0
+    model_version: str = "stream-finalize"
+
+
 class FightEventAnalysis:
     """Turns temporal fight-classifier scores into a stable event lifecycle."""
 
@@ -104,6 +115,27 @@ class FightEventAnalysis:
         else:
             state.negative_since = None
         return []
+
+    def finalize(self, camera_id: str, source_epoch: int, ended_at: datetime) -> list[EventRecord]:
+        """Close every open fight event for one source epoch when its stream ends.
+
+        A stream restart or replay end must never leave an event stuck in the
+        OPEN state; tracks cannot survive a new source epoch (see CONTEXT.md).
+        """
+        stream = (camera_id, source_epoch)
+        state = self._states.get(stream)
+        if state is None or state.event_id is None:
+            return []
+        state.revision += 1
+        record = self._record(
+            _FinalObservation(camera_id, source_epoch, ended_at), state, "END"
+        )
+        state.cooldown_until = ended_at + timedelta(seconds=self.policy.cooldown_seconds)
+        state.event_id = None
+        state.started_at = None
+        state.subject_track_keys = ()
+        state.negative_since = None
+        return [record]
 
     @staticmethod
     def _merge_subjects(left: tuple[str, ...], right: tuple[str, ...]) -> tuple[str, ...]:

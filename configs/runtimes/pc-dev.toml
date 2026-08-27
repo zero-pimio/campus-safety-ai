@@ -1,0 +1,6 @@
+schema_version = "1.0"
+runtime_version = "pc-dev-v1"
+adapter = "ultralytics"
+precision = "fp32"
+device = "auto"
+

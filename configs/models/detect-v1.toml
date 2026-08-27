@@ -1,0 +1,6 @@
+schema_version = "1.0"
+model_version = "yolo-campus-detect-dev"
+task = "detect"
+bbox_coordinates = "original_image_xyxy"
+class_names = ["person", "bicycle", "car", "motorcycle"]
+

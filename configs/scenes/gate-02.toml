@@ -1,0 +1,10 @@
+schema_version = "1.0"
+config_version = "gate-02-scene-v1"
+camera_id = "gate-02"
+timezone = "Asia/Shanghai"
+
+[intrusion_zone]
+zone_id = "gate-02-restricted"
+polygon_normalized = [[0.45, 0.20], [0.95, 0.20], [0.95, 0.95], [0.45, 0.95]]
+inclusion_point = "bbox_bottom_center"
+

@@ -1,0 +1,9 @@
+schema_version = "1.0"
+config_version = "gate-02-intrusion-v1"
+event_type = "intrusion"
+target_labels = ["person"]
+minimum_confidence = 0.40
+enter_seconds = 2.0
+exit_seconds = 1.0
+cooldown_seconds = 10.0
+

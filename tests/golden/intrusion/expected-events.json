@@ -1,0 +1,5 @@
+[
+  {"eventType": "intrusion", "phase": "START", "observedAt": "2026-08-25T08:00:02Z"},
+  {"eventType": "intrusion", "phase": "END", "observedAt": "2026-08-25T08:00:04Z"}
+]
+

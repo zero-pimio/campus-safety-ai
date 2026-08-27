@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "campus-safety-ai"
+version = "0.1.0"
+description = "Contract-first campus safety edge AI prototype"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.optional-dependencies]
+vision = [
+    "numpy==1.26.4",
+    "opencv-python==4.11.0.86",
+    "ultralytics==8.4.128",
+]
+fight-video = [
+    "numpy==1.26.4",
+    "opencv-python-headless==4.11.0.86",
+    "paddlepaddle==3.3.1; python_version < '3.14'",
+    "pillow>=10,<13",
+]
+training = [
+    "numpy==1.26.4",
+    "opencv-python-headless==4.11.0.86",
+    "torch==2.13.0",
+    "torchvision==0.28.0",
+    "onnx>=1.17,<2",
+    "onnxruntime>=1.20,<2",
+]
+dev = ["pytest"]
+
+[project.scripts]
+campus-safety-replay = "campus_safety_ai.apps.offline_replay:main"
+campus-safety-demo = "campus_safety_ai.apps.fake_chain:main"
+campus-safety-fight-replay = "campus_safety_ai.apps.fight_replay:main"
+campus-safety-fight-video = "campus_safety_ai.apps.fight_video:main"
+campus-safety-fight-visualize = "campus_safety_ai.apps.fight_visualize:main"
+campus-safety-build-fight-manifest = "campus_safety_ai.apps.build_fight_manifest:main"
+campus-safety-train-fight = "campus_safety_ai.apps.train_fight:main"
+campus-safety-export-fight-onnx = "campus_safety_ai.apps.export_fight_onnx:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

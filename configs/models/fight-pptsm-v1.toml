@@ -1,0 +1,5 @@
+schema_version = "1.0"
+model_version = "pphuman-pptsm-fight-2022"
+backend = "paddle"
+path = "models/ppTSM"
+device = "cpu"

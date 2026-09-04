@@ -1,0 +1,146 @@
+from __future__ import annotations
+
+import tomllib
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any, Literal
+
+from campus_safety_ai.core.event_analysis import IntrusionPolicy
+from campus_safety_ai.core.fight_analysis import FightPolicy
+
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+
+def _read(path: Path) -> dict[str, Any]:
+    with path.open("rb") as handle:
+        value = tomllib.load(handle)
+    if value.get("schema_version") != "1.0":
+        raise ValueError(f"unsupported or missing schema_version in {path}")
+    return value
+
+
+def _path(value: str, project_root: Path) -> Path:
+    path = Path(value)
+    return path if path.is_absolute() else project_root / path
+
+
+@dataclass(frozen=True)
+class FightModelSettings:
+    backend: Literal["paddle", "torch", "onnx"]
+    path: Path
+    model_version: str
+    device: str = "auto"
+
+
+@dataclass(frozen=True)
+class PlatformSettings:
+    destination: Literal["jsonl"]
+    outbox: Path
+    events: Path
+
+
+@dataclass(frozen=True)
+class VideoRuntimeSettings:
+    adapter: Literal["opencv"]
+    tracker_backend: Literal["simple_iou", "bytetrack"]
+    frame_count: int
+    sample_frequency: int
+    fight_event_config: Path
+    fight_model_config: Path
+    platform_config: Path
+    evidence_enabled: bool
+    evidence_dir: Path
+
+
+def load_fight_policy(
+    path: Path = PROJECT_ROOT / "configs/events/fight-v1.toml",
+) -> FightPolicy:
+    value = _read(path)
+    return FightPolicy(
+        edge_id=str(value.get("edge_id", "edge-dev-01")),
+        start_score=float(value["start_score"]),
+        end_score=float(value["end_score"]),
+        confirm_seconds=float(value["confirm_seconds"]),
+        clear_seconds=float(value["clear_seconds"]),
+        cooldown_seconds=float(value["cooldown_seconds"]),
+        config_version=str(value["config_version"]),
+    )
+
+
+def load_intrusion_policy(
+    event_path: Path = PROJECT_ROOT / "configs/events/intrusion-v1.toml",
+    scene_path: Path = PROJECT_ROOT / "configs/scenes/gate-02.toml",
+) -> IntrusionPolicy:
+    event = _read(event_path)
+    scene = _read(scene_path)
+    zone = scene["intrusion_zone"]
+    return IntrusionPolicy(
+        edge_id=str(event.get("edge_id", "edge-dev-01")),
+        zone_id=str(zone["zone_id"]),
+        polygon=tuple((float(point[0]), float(point[1])) for point in zone["polygon_normalized"]),
+        enter_seconds=float(event["enter_seconds"]),
+        exit_seconds=float(event["exit_seconds"]),
+        cooldown_seconds=float(event["cooldown_seconds"]),
+        minimum_confidence=float(event["minimum_confidence"]),
+        config_version=str(event["config_version"]),
+    )
+
+
+def load_fight_model_settings(
+    path: Path,
+    project_root: Path = PROJECT_ROOT,
+) -> FightModelSettings:
+    value = _read(path)
+    backend = str(value["backend"])
+    if backend not in {"paddle", "torch", "onnx"}:
+        raise ValueError(f"unsupported fight model backend: {backend}")
+    return FightModelSettings(
+        backend=backend,  # type: ignore[arg-type]
+        path=_path(str(value["path"]), project_root),
+        model_version=str(value["model_version"]),
+        device=str(value.get("device", "auto")),
+    )
+
+
+def load_platform_settings(
+    path: Path,
+    project_root: Path = PROJECT_ROOT,
+) -> PlatformSettings:
+    value = _read(path)
+    destination = str(value["destination"])
+    if destination != "jsonl":
+        raise ValueError(f"unsupported local destination: {destination}")
+    return PlatformSettings(
+        destination="jsonl",
+        outbox=_path(str(value["outbox"]), project_root),
+        events=_path(str(value["events"]), project_root),
+    )
+
+
+def load_video_runtime_settings(
+    path: Path = PROJECT_ROOT / "configs/runtimes/pc-dev.toml",
+    project_root: Path = PROJECT_ROOT,
+) -> VideoRuntimeSettings:
+    value = _read(path)
+    adapter = str(value["adapter"])
+    if adapter != "opencv":
+        raise ValueError(f"unsupported video adapter: {adapter}")
+    tracker_backend = str(value.get("tracker_backend", "simple_iou"))
+    if tracker_backend not in {"simple_iou", "bytetrack"}:
+        raise ValueError(f"unsupported tracker backend: {tracker_backend}")
+    frame_count = int(value.get("frame_count", 8))
+    sample_frequency = int(value.get("sample_frequency", 7))
+    if frame_count <= 0 or sample_frequency <= 0:
+        raise ValueError("frame_count and sample_frequency must be positive")
+    return VideoRuntimeSettings(
+        adapter="opencv",
+        tracker_backend=tracker_backend,  # type: ignore[arg-type]
+        frame_count=frame_count,
+        sample_frequency=sample_frequency,
+        fight_event_config=_path(str(value["fight_event_config"]), project_root),
+        fight_model_config=_path(str(value["fight_model_config"]), project_root),
+        platform_config=_path(str(value["platform_config"]), project_root),
+        evidence_enabled=bool(value.get("evidence_enabled", False)),
+        evidence_dir=_path(str(value.get("evidence_dir", "runtime/evidence")), project_root),
+    )

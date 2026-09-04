@@ -71,8 +71,8 @@ class TrackerTests(unittest.TestCase):
         first = batch(1, self.origin, (Detection("person", 0.9, BBox(100, 100, 200, 300)),))
         second = batch(2, self.origin + timedelta(seconds=0.5), (Detection("person", 0.8, BBox(105, 100, 205, 300)),))
 
-        first_tracks = self.tracker.update(first)
-        second_tracks = self.tracker.update(second)
+        first_tracks = self.tracker.update(first).tracks
+        second_tracks = self.tracker.update(second).tracks
 
         self.assertEqual(len(first_tracks), len(second_tracks), 1)
         self.assertEqual(first_tracks[0].track_key, second_tracks[0].track_key)
@@ -81,8 +81,8 @@ class TrackerTests(unittest.TestCase):
         first = batch(1, self.origin, (Detection("person", 0.9, BBox(100, 100, 200, 300)),))
         late = batch(2, self.origin + timedelta(seconds=10), (Detection("person", 0.8, BBox(100, 100, 200, 300)),))
 
-        first_tracks = self.tracker.update(first)
-        late_tracks = self.tracker.update(late)
+        first_tracks = self.tracker.update(first).tracks
+        late_tracks = self.tracker.update(late).tracks
 
         self.assertNotEqual(first_tracks[0].track_key, late_tracks[0].track_key)
 
@@ -109,9 +109,41 @@ class TrackerTests(unittest.TestCase):
             model_version="fake-v1",
             inference_ms=1,
         )
-        one = self.tracker.update(epoch_one)
-        two = self.tracker.update(epoch_two)
+        one = self.tracker.update(epoch_one).tracks
+        two = self.tracker.update(epoch_two).tracks
         self.assertNotEqual(one[0].track_key, two[0].track_key)
+
+    def test_expired_track_is_reported(self) -> None:
+        first = batch(1, self.origin, (Detection("person", 0.9, BBox(100, 100, 200, 300)),))
+        key = self.tracker.update(first).tracks[0].track_key
+
+        expired = self.tracker.update(batch(2, self.origin + timedelta(seconds=3), ()))
+
+        self.assertEqual(expired.expired_track_keys, (key,))
+
+
+class LostTrackClosureTests(unittest.TestCase):
+    def test_open_intrusion_closes_when_track_expires(self) -> None:
+        origin = datetime(2026, 8, 25, tzinfo=timezone.utc)
+        analysis = EventAnalysis(
+            IntrusionPolicy(
+                edge_id="edge-01",
+                zone_id="all",
+                polygon=((0, 0), (1, 0), (1, 1), (0, 1)),
+                enter_seconds=0,
+                exit_seconds=1,
+                cooldown_seconds=0,
+            ),
+            tracker=SimpleIoUTracker(max_gap_seconds=2),
+        )
+        inside = Detection("person", 0.9, BBox(100, 100, 200, 300))
+        started = analysis.advance(batch(1, origin, (inside,)))
+
+        ended = analysis.advance(batch(2, origin + timedelta(seconds=3), ()))
+
+        self.assertEqual([record.phase for record in started], ["START"])
+        self.assertEqual([record.phase for record in ended], ["END"])
+        self.assertEqual(ended[0].confidence, 0.0)
 
 
 class DeliveryContextTests(unittest.TestCase):

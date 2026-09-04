@@ -2,117 +2,78 @@ from __future__ import annotations
 
 import argparse
 import json
-from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Iterator, Protocol, Sequence
+from typing import Any
+from urllib.parse import urlparse
 
-from campus_safety_ai.adapters.runtimes.paddle_fight import (
-    FightPrediction,
-    PaddlePpTsmFightClassifier,
-)
+from campus_safety_ai.adapters.evidence import DirectoryEvidenceSink, NullEvidenceSink
+from campus_safety_ai.adapters.runtimes.fight_factory import build_fight_classifier
+from campus_safety_ai.adapters.runtimes.paddle_fight import PaddlePpTsmFightClassifier
+from campus_safety_ai.adapters.video_sources import OpenCvVideoSource
 from campus_safety_ai.apps.fight_replay import default_fight_analysis
-from campus_safety_ai.contracts import BehaviorObservation, iso_time, parse_time
-
-
-@dataclass(frozen=True)
-class VideoWindow:
-    frames: tuple[Any, ...]
-    first_frame: int
-    last_frame: int
-
-
-class FightClassifier(Protocol):
-    model_version: str
-
-    def predict(self, rgb_frames: Sequence[Any]) -> FightPrediction: ...
+from campus_safety_ai.contracts import iso_time, parse_time
+from campus_safety_ai.core.event_delivery import EventDelivery, JsonlDestination
+from campus_safety_ai.core.fight_analysis import FightEventAnalysis
+from campus_safety_ai.core.fight_inference import FightClassifier
+from campus_safety_ai.core.fight_pipeline import EvidenceSink, FightPipelineResult, FightVideoPipeline
+from campus_safety_ai.settings import (
+    PROJECT_ROOT,
+    load_fight_model_settings,
+    load_fight_policy,
+    load_platform_settings,
+    load_video_runtime_settings,
+)
 
 
 def read_video_windows(
-    video_path: Path, frame_len: int = 8, sample_frequency: int = 7
-) -> tuple[float, int, Iterator[VideoWindow]]:
-    try:
-        import cv2
-    except ImportError as error:
-        raise RuntimeError(
-            "OpenCV is not installed; run scripts/setup_video_runtime.sh"
-        ) from error
+    video_path: str | Path, frame_len: int = 8, sample_frequency: int = 7
+) -> tuple[float, int, OpenCvVideoSource]:
+    """Compatibility wrapper around the OpenCV video-source adapter."""
 
-    capture = cv2.VideoCapture(str(video_path))
-    if not capture.isOpened():
-        capture.release()
-        raise ValueError(f"cannot open video: {video_path}")
+    source = OpenCvVideoSource(video_path, frame_len, sample_frequency)
+    return source.fps, source.sample_frequency, source
 
-    fps = float(capture.get(cv2.CAP_PROP_FPS))
-    frame_count = int(capture.get(cv2.CAP_PROP_FRAME_COUNT))
-    if fps <= 0 or frame_count < frame_len:
-        capture.release()
+
+def _execute(
+    video_path: str | Path,
+    classifier: FightClassifier,
+    camera_id: str,
+    started_at: datetime,
+    source_epoch: int = 1,
+    frame_len: int | None = None,
+    sample_frequency: int = 7,
+    analysis: FightEventAnalysis | None = None,
+    evidence: EvidenceSink | None = None,
+) -> FightPipelineResult:
+    requested_frame_len = frame_len or classifier.frame_len
+    if requested_frame_len != classifier.frame_len:
         raise ValueError(
-            f"video must report a positive FPS and contain at least {frame_len} frames"
+            f"runtime frame_count={requested_frame_len} does not match "
+            f"classifier frame_len={classifier.frame_len}"
         )
-
-    effective_frequency = min(sample_frequency, max(1, frame_count // frame_len))
-
-    def windows() -> Iterator[VideoWindow]:
-        sampled: list[Any] = []
-        sampled_indices: list[int] = []
-        frame_index = 0
-        try:
-            while True:
-                available, bgr_frame = capture.read()
-                if not available:
-                    break
-                if frame_index % effective_frequency == 0:
-                    sampled.append(cv2.cvtColor(bgr_frame, cv2.COLOR_BGR2RGB))
-                    sampled_indices.append(frame_index)
-                    if len(sampled) == frame_len:
-                        yield VideoWindow(
-                            frames=tuple(sampled),
-                            first_frame=sampled_indices[0],
-                            last_frame=sampled_indices[-1],
-                        )
-                        sampled.clear()
-                        sampled_indices.clear()
-                frame_index += 1
-        finally:
-            capture.release()
-
-    return fps, effective_frequency, windows()
+    source = OpenCvVideoSource(video_path, requested_frame_len, sample_frequency)
+    pipeline = FightVideoPipeline(
+        classifier,
+        analysis or default_fight_analysis(),
+        evidence or NullEvidenceSink(),
+    )
+    return pipeline.run(source, camera_id, source_epoch, started_at)
 
 
 def analyze_video(
-    video_path: Path,
+    video_path: str | Path,
     classifier: FightClassifier,
     camera_id: str,
     started_at: datetime,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]], float, int]:
-    fps, sample_frequency, windows = read_video_windows(video_path)
-    analysis = default_fight_analysis()
-    observations: list[dict[str, Any]] = []
-    events: list[dict[str, Any]] = []
-
-    for sequence, window in enumerate(windows, start=1):
-        prediction = classifier.predict(window.frames)
-        window_started_at = started_at + timedelta(seconds=window.first_frame / fps)
-        window_ended_at = started_at + timedelta(seconds=window.last_frame / fps)
-        observation = BehaviorObservation(
-            camera_id=camera_id,
-            source_epoch=1,
-            sequence=sequence,
-            observed_at=window_ended_at,
-            window_started_at=window_started_at,
-            window_ended_at=window_ended_at,
-            behavior="fighting",
-            score=prediction.fight_score,
-            model_version=classifier.model_version,
-        )
-        value = observation.to_dict()
-        value["sampledFrameRange"] = [window.first_frame, window.last_frame]
-        value["logits"] = list(prediction.logits)
-        observations.append(value)
-        events.extend(record.to_dict() for record in analysis.advance(observation))
-
-    return observations, events, fps, sample_frequency
+    result = _execute(video_path, classifier, camera_id, started_at)
+    return (
+        list(result.observations),
+        [record.to_dict() for record in result.events],
+        result.fps,
+        result.sample_frequency,
+    )
 
 
 def _write_jsonl(path: Path, records: list[dict[str, Any]]) -> None:
@@ -122,21 +83,50 @@ def _write_jsonl(path: Path, records: list[dict[str, Any]]) -> None:
             handle.write(json.dumps(record, ensure_ascii=False, separators=(",", ":")) + "\n")
 
 
+def _source_stem(source: str | Path, camera_id: str) -> str:
+    value = str(source)
+    if "://" in value:
+        return Path(urlparse(value).path).stem or camera_id
+    return Path(value).stem
+
+
 def run(
-    video_path: Path,
+    video_path: str | Path,
     model_dir: Path,
     output_dir: Path,
     camera_id: str,
     started_at: datetime,
+    *,
+    classifier: FightClassifier | None = None,
+    analysis: FightEventAnalysis | None = None,
+    evidence: EvidenceSink | None = None,
+    source_epoch: int = 1,
+    frame_len: int = 8,
+    sample_frequency: int = 7,
+    events_path: Path | None = None,
+    outbox_path: Path | None = None,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-    classifier = PaddlePpTsmFightClassifier(model_dir)
-    observations, events, fps, sample_frequency = analyze_video(
-        video_path, classifier, camera_id, started_at
+    classifier = classifier or PaddlePpTsmFightClassifier(model_dir)
+    result = _execute(
+        video_path,
+        classifier,
+        camera_id,
+        started_at,
+        source_epoch,
+        frame_len,
+        sample_frequency,
+        analysis,
+        evidence,
     )
-    observations_path = output_dir / f"{video_path.stem}-observations.jsonl"
-    events_path = output_dir / f"{video_path.stem}-events.jsonl"
+    observations = list(result.observations)
+    events = [record.to_dict() for record in result.events]
+    stem = _source_stem(video_path, camera_id)
+    observations_path = output_dir / f"{stem}-observations.jsonl"
+    events_path = events_path or output_dir / f"{stem}-events.jsonl"
+    outbox_path = outbox_path or events_path.with_suffix(".sqlite3")
     _write_jsonl(observations_path, observations)
-    _write_jsonl(events_path, events)
+    with EventDelivery(outbox_path, JsonlDestination(events_path)) as delivery:
+        delivery.submit(list(result.events))
 
     for item in observations:
         start, end = item["sampledFrameRange"]
@@ -145,22 +135,37 @@ def run(
             f"fight_score={item['score']:.6f}"
         )
     print(
-        f"video={video_path} fps={fps:.3f} sample_frequency={sample_frequency} "
+        f"video={video_path} fps={result.fps:.3f} "
+        f"sample_frequency={result.sample_frequency} "
         f"windows={len(observations)} events={len(events)}"
     )
     print(f"observations -> {observations_path}")
     print(f"events -> {events_path}")
+    print(f"outbox -> {outbox_path}")
     return observations, events
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Classify fight windows in a local video and emit project contracts"
+        description="Classify fight windows from an MP4 or RTSP source and emit project contracts"
     )
-    parser.add_argument("--video", type=Path, required=True)
-    parser.add_argument("--model-dir", type=Path, default=Path("models/ppTSM"))
+    parser.add_argument("--video", required=True, help="local video path or RTSP URL")
+    parser.add_argument(
+        "--runtime-config",
+        type=Path,
+        default=PROJECT_ROOT / "configs/runtimes/pc-dev.toml",
+    )
+    parser.add_argument("--model-config", type=Path)
+    parser.add_argument(
+        "--model-dir", type=Path, help="legacy override for a Paddle PP-TSM directory"
+    )
     parser.add_argument("--output-dir", type=Path, default=Path("runtime/fight-video"))
     parser.add_argument("--camera-id", default="offline-video-01")
+    parser.add_argument("--source-epoch", type=int, default=1)
+    parser.add_argument("--events", type=Path)
+    parser.add_argument("--outbox", type=Path)
+    parser.add_argument("--evidence-dir", type=Path)
+    parser.add_argument("--no-evidence", action="store_true")
     parser.add_argument(
         "--started-at",
         help="timezone-aware ISO timestamp; defaults to the current UTC time",
@@ -171,13 +176,36 @@ def main() -> None:
         if arguments.started_at
         else datetime.now(timezone.utc)
     )
+    runtime = load_video_runtime_settings(arguments.runtime_config)
+    model_config = arguments.model_config or runtime.fight_model_config
+    classifier = (
+        PaddlePpTsmFightClassifier(arguments.model_dir)
+        if arguments.model_dir
+        else build_fight_classifier(load_fight_model_settings(model_config))
+    )
+    policy = load_fight_policy(runtime.fight_event_config)
+    platform = load_platform_settings(runtime.platform_config)
+    evidence_dir = arguments.evidence_dir or runtime.evidence_dir
+    evidence = (
+        NullEvidenceSink()
+        if arguments.no_evidence or not runtime.evidence_enabled
+        else DirectoryEvidenceSink(evidence_dir, policy.start_score)
+    )
     print(f"video_started_at={iso_time(started_at)}")
     run(
         arguments.video,
-        arguments.model_dir,
+        arguments.model_dir or Path("models/ppTSM"),
         arguments.output_dir,
         arguments.camera_id,
         started_at,
+        classifier=classifier,
+        analysis=FightEventAnalysis(policy),
+        evidence=evidence,
+        source_epoch=arguments.source_epoch,
+        frame_len=runtime.frame_count,
+        sample_frequency=runtime.sample_frequency,
+        events_path=arguments.events or platform.events,
+        outbox_path=arguments.outbox or platform.outbox,
     )
 
 

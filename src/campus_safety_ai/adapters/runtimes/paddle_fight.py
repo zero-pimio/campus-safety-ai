@@ -1,16 +1,9 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Sequence
 
-
-@dataclass(frozen=True)
-class FightPrediction:
-    """Raw two-class output plus the normalized probability of class 1 (fight)."""
-
-    logits: tuple[float, float]
-    fight_score: float
+from campus_safety_ai.core.fight_inference import FightPrediction
 
 
 class PaddlePpTsmFightClassifier:

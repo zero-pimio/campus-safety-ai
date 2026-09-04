@@ -3,36 +3,18 @@ from __future__ import annotations
 import argparse
 import json
 import random
-from dataclasses import asdict, dataclass
+from dataclasses import asdict
 from pathlib import Path
 from typing import Any
 
 from campus_safety_ai.training.manifest import FightSample, read_manifest
+from campus_safety_ai.training.metrics import Metrics, classification_metrics
 from campus_safety_ai.training.model import FightTsn
 from campus_safety_ai.training.video_dataset import FightVideoDataset
 
 
-@dataclass(frozen=True)
-class Metrics:
-    loss: float
-    accuracy: float
-    balanced_accuracy: float
-    precision: float
-    recall: float
-    f1: float
-
-
 def _metrics(loss: float, labels: list[int], predictions: list[int]) -> Metrics:
-    tp = sum(label == prediction == 1 for label, prediction in zip(labels, predictions))
-    tn = sum(label == prediction == 0 for label, prediction in zip(labels, predictions))
-    fp = sum(label == 0 and prediction == 1 for label, prediction in zip(labels, predictions))
-    fn = sum(label == 1 and prediction == 0 for label, prediction in zip(labels, predictions))
-    precision = tp / (tp + fp) if tp + fp else 0.0
-    recall = tp / (tp + fn) if tp + fn else 0.0
-    specificity = tn / (tn + fp) if tn + fp else 0.0
-    accuracy = (tp + tn) / len(labels) if labels else 0.0
-    f1 = 2 * precision * recall / (precision + recall) if precision + recall else 0.0
-    return Metrics(loss, accuracy, (recall + specificity) / 2, precision, recall, f1)
+    return classification_metrics(loss, labels, predictions)
 
 
 def _select_device(requested: str) -> str:

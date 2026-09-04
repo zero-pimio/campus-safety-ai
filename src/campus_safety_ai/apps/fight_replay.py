@@ -6,21 +6,12 @@ from pathlib import Path
 
 from campus_safety_ai.contracts import BehaviorObservation
 from campus_safety_ai.core.event_delivery import EventDelivery, JsonlDestination
-from campus_safety_ai.core.fight_analysis import FightEventAnalysis, FightPolicy
+from campus_safety_ai.core.fight_analysis import FightEventAnalysis
+from campus_safety_ai.settings import load_fight_policy
 
 
 def default_fight_analysis() -> FightEventAnalysis:
-    return FightEventAnalysis(
-        FightPolicy(
-            edge_id="edge-dev-01",
-            start_score=0.75,
-            end_score=0.35,
-            confirm_seconds=2.0,
-            clear_seconds=2.0,
-            cooldown_seconds=10.0,
-            config_version="gate-02-fight-v1",
-        )
-    )
+    return FightEventAnalysis(load_fight_policy())
 
 
 def run(input_path: Path, output_path: Path) -> int:
@@ -61,4 +52,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

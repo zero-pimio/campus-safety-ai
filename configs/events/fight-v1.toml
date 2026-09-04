@@ -1,5 +1,6 @@
 schema_version = "1.0"
 config_version = "gate-02-fight-v1"
+edge_id = "edge-dev-01"
 event_type = "person_fighting"
 behavior_label = "fighting"
 start_score = 0.75
@@ -7,4 +8,3 @@ end_score = 0.35
 confirm_seconds = 2.0
 clear_seconds = 2.0
 cooldown_seconds = 10.0
-

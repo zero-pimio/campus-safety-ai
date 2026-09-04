@@ -1,6 +1,13 @@
 schema_version = "1.0"
 runtime_version = "pc-dev-v1"
-adapter = "ultralytics"
+adapter = "opencv"
+tracker_backend = "simple_iou"
 precision = "fp32"
 device = "auto"
-
+frame_count = 8
+sample_frequency = 7
+fight_event_config = "configs/events/fight-v1.toml"
+fight_model_config = "configs/models/fight-pptsm-v1.toml"
+platform_config = "configs/platform/jsonl-dev.toml"
+evidence_enabled = true
+evidence_dir = "runtime/fight-video/evidence"

@@ -27,3 +27,16 @@ Bus Violence 是车内专项数据，UT/CAVIAR/BEHAVE 主要用于互动或定�
 ## 验收
 
 训练阶段报告 accuracy、balanced accuracy、precision、recall、F1。最终还必须把窗口分数接回事件状态机，报告事件级 precision/recall/F1、漏报事件数、平均发现延迟和每摄像头每小时误报数。
+
+## 当前公开数据基线
+
+`runtime/training/fight-tsn-v1/best.pt` 的 checkpoint 验证集 F1 为 `0.84`。使用冻结 manifest 的 92 段 test split 独立评估结果：
+
+- accuracy：`0.771739`
+- balanced accuracy：`0.763032`
+- precision：`0.767857`
+- recall：`0.843137`
+- F1：`0.803738`
+- confusion matrix：TN 28、FP 13、FN 8、TP 43
+
+报告由 `campus-safety-evaluate-fight` 生成并保存在忽略目录 `runtime/training/fight-tsn-v1/test-evaluation.json`。全量 checkpoint 已导出 ONNX，PyTorch/ONNX 最大 logits 绝对误差为 `1.1146068572998047e-05`。这些数字只代表 SCFD + AIRTLab 公开数据，不代表校园现场验收。

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime, timedelta
+from typing import Protocol
 from uuid import NAMESPACE_URL, uuid5
 
 from campus_safety_ai.contracts import BBox, Detection, Detections, EventRecord, Track
@@ -58,6 +59,16 @@ class _TrackedObject:
     last_seen: datetime
 
 
+@dataclass(frozen=True)
+class TrackingResult:
+    tracks: tuple[Track, ...]
+    expired_track_keys: tuple[str, ...]
+
+
+class Tracker(Protocol):
+    def update(self, batch: Detections) -> TrackingResult: ...
+
+
 class SimpleIoUTracker:
     """Deterministic G1 tracker; replace internally with ByteTrack for G3."""
 
@@ -68,13 +79,22 @@ class SimpleIoUTracker:
         self._objects: dict[int, _TrackedObject] = {}
         self._epoch: tuple[str, int] | None = None
 
-    def update(self, batch: Detections) -> list[Track]:
+    @staticmethod
+    def _track_key(camera_id: str, source_epoch: int, local_id: int) -> str:
+        return f"{camera_id}:{source_epoch}:1:{local_id}"
+
+    def update(self, batch: Detections) -> TrackingResult:
         epoch = (batch.camera_id, batch.source_epoch)
         if self._epoch != epoch:
             self._objects.clear()
             self._next_id = 1
             self._epoch = epoch
 
+        expired = tuple(
+            self._track_key(batch.camera_id, batch.source_epoch, key)
+            for key, value in self._objects.items()
+            if (batch.captured_at - value.last_seen).total_seconds() > self.max_gap_seconds
+        )
         self._objects = {
             key: value
             for key, value in self._objects.items()
@@ -99,14 +119,14 @@ class SimpleIoUTracker:
             )
             result.append(
                 Track(
-                    track_key=f"{batch.camera_id}:{batch.source_epoch}:1:{track_id}",
+                    track_key=self._track_key(batch.camera_id, batch.source_epoch, track_id),
                     label=detection.label,
                     confidence=detection.confidence,
                     bbox=detection.bbox,
                     observed_at=batch.captured_at,
                 )
             )
-        return result
+        return TrackingResult(tuple(result), expired)
 
 
 @dataclass
@@ -120,7 +140,7 @@ class _IntrusionState:
 
 
 class EventAnalysis:
-    def __init__(self, policy: IntrusionPolicy, tracker: SimpleIoUTracker | None = None) -> None:
+    def __init__(self, policy: IntrusionPolicy, tracker: Tracker | None = None) -> None:
         self.policy = policy
         self.tracker = tracker or SimpleIoUTracker()
         self._states: dict[str, _IntrusionState] = {}
@@ -134,7 +154,16 @@ class EventAnalysis:
         self._last_sequence[stream] = batch.sequence
 
         records: list[EventRecord] = []
-        for track in self.tracker.update(batch):
+        tracking = self.tracker.update(batch)
+        for track_key in tracking.expired_track_keys:
+            state = self._states.pop(track_key, None)
+            if state is None or state.event_id is None:
+                continue
+            state.revision += 1
+            records.append(
+                self._ending_record(batch.camera_id, batch.captured_at, track_key, 0.0, state)
+            )
+        for track in tracking.tracks:
             if track.label != "person" or track.confidence < self.policy.minimum_confidence:
                 continue
             state = self._states.setdefault(track.track_key, _IntrusionState())

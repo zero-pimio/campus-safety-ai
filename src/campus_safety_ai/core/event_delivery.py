@@ -24,6 +24,7 @@ class JsonlDestination:
     def __init__(self, path: Path) -> None:
         self.path = path
         path.parent.mkdir(parents=True, exist_ok=True)
+        path.touch(exist_ok=True)
 
     def publish(self, record: dict) -> None:
         with self.path.open("a", encoding="utf-8") as handle:
@@ -92,4 +93,3 @@ class EventDelivery:
             # Drain whatever the caller produced before closing cleanly.
             self.flush()
         self.close()
-

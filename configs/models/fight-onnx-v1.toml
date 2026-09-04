@@ -1,0 +1,5 @@
+schema_version = "1.0"
+model_version = "fight-tsn-mobilenet-v3-small-v1-onnx"
+backend = "onnx"
+path = "runtime/training/fight-tsn-v1/fight-tsn.onnx"
+device = "cpu"

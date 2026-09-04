@@ -15,6 +15,7 @@ vision = [
     "numpy==1.26.4",
     "opencv-python==4.11.0.86",
     "ultralytics==8.4.128",
+    "lap>=0.5.12,<1",
 ]
 fight-video = [
     "numpy==1.26.4",
@@ -41,6 +42,7 @@ campus-safety-fight-visualize = "campus_safety_ai.apps.fight_visualize:main"
 campus-safety-build-fight-manifest = "campus_safety_ai.apps.build_fight_manifest:main"
 campus-safety-train-fight = "campus_safety_ai.apps.train_fight:main"
 campus-safety-export-fight-onnx = "campus_safety_ai.apps.export_fight_onnx:main"
+campus-safety-evaluate-fight = "campus_safety_ai.apps.evaluate_fight:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

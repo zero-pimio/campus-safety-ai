@@ -1,16 +1,8 @@
-from campus_safety_ai.core.event_analysis import EventAnalysis, IntrusionPolicy
+from campus_safety_ai.adapters.runtimes.tracker_factory import build_tracker
+from campus_safety_ai.core.event_analysis import EventAnalysis
+from campus_safety_ai.settings import load_intrusion_policy, load_video_runtime_settings
 
 
 def default_analysis() -> EventAnalysis:
-    return EventAnalysis(
-        IntrusionPolicy(
-            edge_id="edge-dev-01",
-            zone_id="gate-02-restricted",
-            polygon=((0.45, 0.2), (0.95, 0.2), (0.95, 0.95), (0.45, 0.95)),
-            enter_seconds=2.0,
-            exit_seconds=1.0,
-            cooldown_seconds=10.0,
-            config_version="gate-02-intrusion-v1",
-        )
-    )
-
+    runtime = load_video_runtime_settings()
+    return EventAnalysis(load_intrusion_policy(), build_tracker(runtime.tracker_backend))

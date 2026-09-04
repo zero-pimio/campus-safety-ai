@@ -1,5 +1,4 @@
 schema_version = "1.0"
 destination = "jsonl"
-outbox = "runtime/outbox.sqlite3"
-events = "runtime/events.jsonl"
-
+outbox = "runtime/fight-video/outbox.sqlite3"
+events = "runtime/fight-video/events.jsonl"

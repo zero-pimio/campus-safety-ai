@@ -93,7 +93,7 @@ detect(framePacket) -> Detections
 advance(detections) -> list[EventRecord]
 ```
 
-它内部承载跟踪、区域判定、候选事件、去抖、START/UPDATE/END 生命周期和事件策略。Supervision ByteTrack 是内部实现，不提升为外部 seam；只有出现第二个真实跟踪实现时再抽取内部 interface。
+它内部承载跟踪、区域判定、候选事件、去抖、START/UPDATE/END 生命周期和事件策略。当前内部 `Tracker` seam 已有确定性的 SimpleIoU 和 Ultralytics ByteTrack 两个 adapter；两者都只输出项目原生 `TrackingResult`，丢轨必须显式返回并收口事件。
 
 它是纯进程内依赖，测试只通过 `advance()` 输入固定检测结果并观察事件记录，不绑定 ByteTrack 内部状态。
 
@@ -103,11 +103,19 @@ advance(detections) -> list[EventRecord]
 submit(eventRecords) -> DeliveryResult
 ```
 
-它隐藏证据保存、SQLite Outbox、重试、退避、幂等确认以及 OpenRemote/MQTT 字段映射。SQLite 和本地文件属于可本地替换依赖；OpenRemote 属于真实外部依赖，生产 adapter 与内存 adapter 位于其内部 seam。
+它隐藏 SQLite Outbox、重试、退避、幂等确认以及 OpenRemote/MQTT 字段映射。SQLite 和本地文件属于可本地替换依赖；OpenRemote 属于真实外部依赖，生产 adapter 与内存 adapter 位于其内部 seam。
 
 正式实现必须让写入 Outbox 与远程投递解耦：`submit()` 只负责持久化并快速返回，后台 worker 负责远程投递。当前同步 `flush()` 仅为 G1 演示，不满足正式 interface。
 
-### 5.4 应用装配
+### 5.4 FightVideoPipeline
+
+```text
+run(videoSource, cameraId, sourceEpoch, startedAt) -> FightPipelineResult
+```
+
+该深 module 统一负责视频窗口时间、`FightClassifier` 调用、行为观测、事件状态机、证据 capture 和 EOF/断流 finalize。视频源已有 OpenCV 文件/RTSP adapter，分类器已有 Paddle、PyTorch 与 ONNX adapter，证据已有空实现和本地截图/采样短片 adapter。RKNN 只需新增分类器 adapter，不得复制事件逻辑。
+
+### 5.5 应用装配
 
 `offline_replay` 和 `edge_agent` 只负责读取配置、创建三个 module、驱动主循环和生命周期管理。业务规则不得散落在 CLI、摄像头 adapter 或平台 adapter 中。
 
@@ -161,7 +169,7 @@ person 检测 → 跟踪 → 底部中心进入禁区
 → 离开持续 T_exit / 策略定义的轨迹终止 → END
 ```
 
-G3 前必须补齐：轨迹消失如何结束、摄像头重连如何收口、边界点算内还是外、ID 切换如何避免重复告警、证据失败如何标记。
+已补齐轨迹超时结束、源周期 finalize 和边界点规则。G3 验收前仍需用真实 RTSP 验证重连、遮挡 ID 切换、证据写盘失败和磁盘配额行为。
 
 ### 8.2 车辆违停
 

@@ -10,7 +10,7 @@ from urllib.parse import urlparse
 from campus_safety_ai.adapters.evidence import DirectoryEvidenceSink, NullEvidenceSink
 from campus_safety_ai.adapters.runtimes.fight_factory import build_fight_classifier
 from campus_safety_ai.adapters.runtimes.paddle_fight import PaddlePpTsmFightClassifier
-from campus_safety_ai.adapters.video_sources import OpenCvVideoSource
+from campus_safety_ai.adapters.video_sources import OpenCvVideoSource, redact_video_source
 from campus_safety_ai.apps.fight_replay import default_fight_analysis
 from campus_safety_ai.contracts import iso_time, parse_time
 from campus_safety_ai.core.event_delivery import EventDelivery, JsonlDestination
@@ -135,7 +135,7 @@ def run(
             f"fight_score={item['score']:.6f}"
         )
     print(
-        f"video={video_path} fps={result.fps:.3f} "
+        f"video={redact_video_source(video_path)} fps={result.fps:.3f} "
         f"sample_frequency={result.sample_frequency} "
         f"windows={len(observations)} events={len(events)}"
     )

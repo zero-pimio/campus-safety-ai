@@ -56,7 +56,7 @@ def evaluate(
     dataset = FightVideoDataset(project_root.resolve(), samples, frame_count, image_size, False)
     loader = DataLoader(dataset, batch_size=batch_size, shuffle=False, num_workers=workers)
     criterion = torch.nn.CrossEntropyLoss()
-    losses: list[float] = []
+    loss_sum = 0.0
     labels: list[int] = []
     predictions: list[int] = []
     fight_scores: list[float] = []
@@ -65,12 +65,12 @@ def evaluate(
             frames = frames.to(selected_device)
             targets = targets.to(selected_device)
             logits = model(frames)
-            losses.append(float(criterion(logits, targets).detach().cpu()))
+            loss_sum += float(criterion(logits, targets).detach().cpu()) * int(targets.numel())
             labels.extend(int(value) for value in targets.detach().cpu().tolist())
             predictions.extend(int(value) for value in logits.argmax(dim=1).detach().cpu().tolist())
             fight_scores.extend(float(value) for value in logits.softmax(dim=1)[:, 1].detach().cpu().tolist())
 
-    metrics = classification_metrics(sum(losses) / max(1, len(losses)), labels, predictions)
+    metrics = classification_metrics(loss_sum / max(1, len(labels)), labels, predictions)
     misclassified = [
         {
             "video_path": sample.video_path,
@@ -87,6 +87,7 @@ def evaluate(
         "schema_version": "1.0",
         "model_name": checkpoint["model_name"],
         "checkpoint": str(checkpoint_path),
+        "checkpoint_sha256": hashlib.sha256(checkpoint_path.read_bytes()).hexdigest(),
         "checkpoint_validation_metrics": checkpoint.get("val_metrics"),
         "manifest": str(manifest_path),
         "manifest_sha256": hashlib.sha256(manifest_path.read_bytes()).hexdigest(),

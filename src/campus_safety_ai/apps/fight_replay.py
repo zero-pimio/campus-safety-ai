@@ -7,15 +7,21 @@ from pathlib import Path
 from campus_safety_ai.contracts import BehaviorObservation
 from campus_safety_ai.core.event_delivery import EventDelivery, JsonlDestination
 from campus_safety_ai.core.fight_analysis import FightEventAnalysis
-from campus_safety_ai.settings import load_fight_policy
+from campus_safety_ai.settings import PROJECT_ROOT, load_fight_policy
 
 
-def default_fight_analysis() -> FightEventAnalysis:
-    return FightEventAnalysis(load_fight_policy())
+def default_fight_analysis(
+    event_config: Path = PROJECT_ROOT / "configs/events/fight-v1.toml",
+) -> FightEventAnalysis:
+    return FightEventAnalysis(load_fight_policy(event_config))
 
 
-def run(input_path: Path, output_path: Path) -> int:
-    analysis = default_fight_analysis()
+def run(
+    input_path: Path,
+    output_path: Path,
+    analysis: FightEventAnalysis | None = None,
+) -> int:
+    analysis = analysis or default_fight_analysis()
     delivery = EventDelivery(output_path.with_suffix(".sqlite3"), JsonlDestination(output_path))
     produced = 0
     last_observation: BehaviorObservation | None = None
@@ -45,8 +51,17 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Replay fight scores through event analysis")
     parser.add_argument("--input", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument(
+        "--event-config",
+        type=Path,
+        default=PROJECT_ROOT / "configs/events/fight-v1.toml",
+    )
     arguments = parser.parse_args()
-    count = run(arguments.input, arguments.output)
+    count = run(
+        arguments.input,
+        arguments.output,
+        default_fight_analysis(arguments.event_config),
+    )
     print(f"produced {count} fight event records -> {arguments.output}")
 
 

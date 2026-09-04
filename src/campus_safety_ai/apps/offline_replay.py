@@ -6,11 +6,15 @@ from pathlib import Path
 
 from campus_safety_ai.apps.common import default_analysis
 from campus_safety_ai.contracts import Detections
+from campus_safety_ai.core.event_analysis import EventAnalysis
 from campus_safety_ai.core.event_delivery import EventDelivery, JsonlDestination
+from campus_safety_ai.settings import PROJECT_ROOT
 
 
-def run(input_path: Path, output_path: Path) -> int:
-    analysis = default_analysis()
+def run(
+    input_path: Path, output_path: Path, analysis: EventAnalysis | None = None
+) -> int:
+    analysis = analysis or default_analysis()
     delivery = EventDelivery(output_path.with_suffix(".sqlite3"), JsonlDestination(output_path))
     produced = 0
     last_batch: Detections | None = None
@@ -38,11 +42,25 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Replay fixed detections through event analysis")
     parser.add_argument("--input", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument(
+        "--event-config",
+        type=Path,
+        default=PROJECT_ROOT / "configs/events/intrusion-v1.toml",
+    )
+    parser.add_argument(
+        "--scene-config",
+        type=Path,
+        default=PROJECT_ROOT / "configs/scenes/gate-02.toml",
+    )
+    parser.add_argument("--tracker", choices=("simple_iou", "bytetrack"))
     arguments = parser.parse_args()
-    count = run(arguments.input, arguments.output)
+    count = run(
+        arguments.input,
+        arguments.output,
+        default_analysis(arguments.event_config, arguments.scene_config, arguments.tracker),
+    )
     print(f"produced {count} event records -> {arguments.output}")
 
 
 if __name__ == "__main__":
     main()
-

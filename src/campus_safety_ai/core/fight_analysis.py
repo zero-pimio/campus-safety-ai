@@ -33,6 +33,7 @@ class _FightState:
     event_id: str | None = None
     started_at: datetime | None = None
     subject_track_keys: tuple[str, ...] = ()
+    evidence_uris: tuple[str, ...] = ()
     revision: int = 0
 
 
@@ -45,6 +46,7 @@ class _FinalObservation:
     observed_at: datetime
     score: float = 0.0
     model_version: str = "stream-finalize"
+    evidence_uris: tuple[str, ...] = ()
 
 
 class FightEventAnalysis:
@@ -69,8 +71,11 @@ class FightEventAnalysis:
         if observation.score >= self.policy.start_score:
             state.negative_since = None
             if state.event_id is not None:
-                state.subject_track_keys = self._merge_subjects(
+                state.subject_track_keys = self._merge_unique(
                     state.subject_track_keys, observation.subject_track_keys
+                )
+                state.evidence_uris = self._merge_unique(
+                    state.evidence_uris, observation.evidence_uris
                 )
                 return []
             if state.cooldown_until is not None and observation.observed_at < state.cooldown_until:
@@ -86,6 +91,7 @@ class FightEventAnalysis:
                 state.event_id = str(uuid5(NAMESPACE_URL, key))
                 state.started_at = state.positive_since
                 state.subject_track_keys = observation.subject_track_keys
+                state.evidence_uris = observation.evidence_uris
                 state.revision = 1
                 return [self._record(observation, state, "START")]
             return []
@@ -105,6 +111,7 @@ class FightEventAnalysis:
                 state.event_id = None
                 state.started_at = None
                 state.subject_track_keys = ()
+                state.evidence_uris = ()
                 state.negative_since = None
                 return [record]
             return []
@@ -134,11 +141,12 @@ class FightEventAnalysis:
         state.event_id = None
         state.started_at = None
         state.subject_track_keys = ()
+        state.evidence_uris = ()
         state.negative_since = None
         return [record]
 
     @staticmethod
-    def _merge_subjects(left: tuple[str, ...], right: tuple[str, ...]) -> tuple[str, ...]:
+    def _merge_unique(left: tuple[str, ...], right: tuple[str, ...]) -> tuple[str, ...]:
         return tuple(dict.fromkeys((*left, *right)))
 
     def _record(
@@ -166,5 +174,5 @@ class FightEventAnalysis:
             config_version=self.policy.config_version,
             idempotency_key=f"{state.event_id}:{state.revision}",
             status="CLOSED" if phase == "END" else "OPEN",
+            evidence_uris=state.evidence_uris,
         )
-

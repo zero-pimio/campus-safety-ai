@@ -18,6 +18,7 @@ class BehaviorContractTests(unittest.TestCase):
             score=0.91,
             model_version="fight-v1",
             subject_track_keys=("track-1", "track-2"),
+            evidence_uris=("snapshot.jpg", "clip.mp4"),
         )
         self.assertEqual(BehaviorObservation.from_dict(value.to_dict()), value)
 
@@ -39,4 +40,3 @@ class BehaviorContractTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

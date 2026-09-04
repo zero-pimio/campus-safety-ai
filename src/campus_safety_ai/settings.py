@@ -42,8 +42,11 @@ class PlatformSettings:
 
 @dataclass(frozen=True)
 class VideoRuntimeSettings:
-    adapter: Literal["opencv"]
+    video_adapter: Literal["opencv"]
+    perception_adapter: str
     tracker_backend: Literal["simple_iou", "bytetrack"]
+    precision: str
+    device: str
     frame_count: int
     sample_frequency: int
     fight_event_config: Path
@@ -123,9 +126,9 @@ def load_video_runtime_settings(
     project_root: Path = PROJECT_ROOT,
 ) -> VideoRuntimeSettings:
     value = _read(path)
-    adapter = str(value["adapter"])
-    if adapter != "opencv":
-        raise ValueError(f"unsupported video adapter: {adapter}")
+    video_adapter = str(value["video_adapter"])
+    if video_adapter != "opencv":
+        raise ValueError(f"unsupported video adapter: {video_adapter}")
     tracker_backend = str(value.get("tracker_backend", "simple_iou"))
     if tracker_backend not in {"simple_iou", "bytetrack"}:
         raise ValueError(f"unsupported tracker backend: {tracker_backend}")
@@ -134,8 +137,11 @@ def load_video_runtime_settings(
     if frame_count <= 0 or sample_frequency <= 0:
         raise ValueError("frame_count and sample_frequency must be positive")
     return VideoRuntimeSettings(
-        adapter="opencv",
+        video_adapter="opencv",
+        perception_adapter=str(value.get("perception_adapter", "ultralytics")),
         tracker_backend=tracker_backend,  # type: ignore[arg-type]
+        precision=str(value.get("precision", "fp32")),
+        device=str(value.get("device", "auto")),
         frame_count=frame_count,
         sample_frequency=sample_frequency,
         fight_event_config=_path(str(value["fight_event_config"]), project_root),

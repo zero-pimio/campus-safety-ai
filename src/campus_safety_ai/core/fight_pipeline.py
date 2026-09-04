@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime, timedelta
 from typing import Any, Iterable, Protocol, Sequence
 
@@ -75,14 +75,23 @@ class FightVideoPipeline:
                 score=prediction.fight_score,
                 model_version=self.classifier.model_version,
             )
+            artifact = None
+            evidence_error = None
+            try:
+                artifact = self.evidence.capture(
+                    observation, window.frames, source.fps / source.sample_frequency
+                )
+            except Exception as error:  # Evidence loss must not suppress the safety event.
+                evidence_error = f"{type(error).__name__}: {error}"
+            if artifact is not None:
+                observation = replace(observation, evidence_uris=tuple(artifact.values()))
             value = observation.to_dict()
             value["sampledFrameRange"] = [window.first_frame, window.last_frame]
             value["logits"] = list(prediction.logits)
-            artifact = self.evidence.capture(
-                observation, window.frames, source.fps / source.sample_frequency
-            )
             if artifact is not None:
                 value["evidence"] = artifact
+            if evidence_error is not None:
+                value["evidenceError"] = evidence_error
             observations.append(value)
             events.extend(self.analysis.advance(observation))
             last_observation = observation

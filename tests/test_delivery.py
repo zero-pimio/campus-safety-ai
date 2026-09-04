@@ -38,10 +38,10 @@ class DeliveryTests(unittest.TestCase):
                 self.assertEqual(delivery.submit([self.record()]), 1)
                 self.assertEqual(delivery.submit([self.record()]), 0)
                 self.assertEqual(len(target.records), 1)
+                self.assertEqual(target.records[0]["evidenceUris"], [])
             finally:
                 delivery.close()
 
 
 if __name__ == "__main__":
     unittest.main()
-

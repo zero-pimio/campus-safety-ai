@@ -52,7 +52,7 @@ def _run_epoch(
 
     training = optimizer is not None
     model.train(training)
-    losses: list[float] = []
+    loss_sum = 0.0
     labels: list[int] = []
     predictions: list[int] = []
     context = torch.enable_grad() if training else torch.inference_mode()
@@ -67,10 +67,10 @@ def _run_epoch(
             if training:
                 loss.backward()
                 optimizer.step()
-            losses.append(float(loss.detach().cpu()))
+            loss_sum += float(loss.detach().cpu()) * int(targets.numel())
             labels.extend(targets.detach().cpu().tolist())
             predictions.extend(logits.argmax(dim=1).detach().cpu().tolist())
-    return _metrics(sum(losses) / max(1, len(losses)), labels, predictions)
+    return _metrics(loss_sum / max(1, len(labels)), labels, predictions)
 
 
 def train(arguments: argparse.Namespace) -> Path:

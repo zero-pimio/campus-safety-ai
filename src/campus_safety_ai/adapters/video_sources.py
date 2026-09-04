@@ -2,8 +2,20 @@ from __future__ import annotations
 
 from pathlib import Path
 from typing import Any, Iterator
+from urllib.parse import urlparse, urlunparse
 
 from campus_safety_ai.core.fight_pipeline import VideoWindow
+
+
+def redact_video_source(uri: str | Path) -> str:
+    value = str(uri)
+    if "://" not in value:
+        return value
+    parsed = urlparse(value)
+    host = parsed.hostname or ""
+    if parsed.port is not None:
+        host = f"{host}:{parsed.port}"
+    return urlunparse((parsed.scheme, host, parsed.path, parsed.params, "", ""))
 
 
 class OpenCvVideoSource:
@@ -21,7 +33,7 @@ class OpenCvVideoSource:
         self._capture = cv2.VideoCapture(str(uri))
         if not self._capture.isOpened():
             self._capture.release()
-            raise ValueError(f"cannot open video source: {uri}")
+            raise ValueError(f"cannot open video source: {redact_video_source(uri)}")
         self.fps = float(self._capture.get(cv2.CAP_PROP_FPS))
         frame_count = int(self._capture.get(cv2.CAP_PROP_FRAME_COUNT))
         if self.fps <= 0:

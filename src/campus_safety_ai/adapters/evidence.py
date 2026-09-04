@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from typing import Any, Sequence
 
@@ -34,12 +35,14 @@ class DirectoryEvidenceSink:
         except ImportError as error:
             raise RuntimeError("install the vision extra to write video evidence") from error
 
-        stem = f"{observation.camera_id}-e{observation.source_epoch}-s{observation.sequence}"
+        camera = re.sub(r"[^A-Za-z0-9_.-]+", "_", observation.camera_id).strip("._") or "camera"
+        stem = f"{camera}-e{observation.source_epoch}-s{observation.sequence}"
         snapshot = self.directory / f"{stem}.jpg"
         clip = self.directory / f"{stem}.mp4"
         first = np.asarray(rgb_frames[0])
         height, width = first.shape[:2]
-        cv2.imwrite(str(snapshot), cv2.cvtColor(first, cv2.COLOR_RGB2BGR))
+        if not cv2.imwrite(str(snapshot), cv2.cvtColor(first, cv2.COLOR_RGB2BGR)):
+            raise ValueError(f"cannot create evidence snapshot: {snapshot}")
         writer = cv2.VideoWriter(
             str(clip), cv2.VideoWriter_fourcc(*"mp4v"), max(sampled_fps, 1.0), (width, height)
         )

@@ -72,7 +72,7 @@ brew install python@3.11
   --model-config configs/models/fight-onnx-v1.toml
 ```
 
-`--video` 也接受 RTSP URL；每次重连必须增加 `--source-epoch`。达到打架阈值的窗口会在 `runtime/fight-video/evidence/` 写入截图、采样短片和 manifest。事件通过 SQLite Outbox 投递到 `runtime/fight-video/events.jsonl`。可用 `--no-evidence`、`--events`、`--outbox` 和 `--evidence-dir` 覆盖本地装配。
+`--video` 也接受 RTSP URL；每次重连必须增加 `--source-epoch`。达到打架阈值的窗口会在 `runtime/fight-video/evidence/` 写入截图、采样短片和 manifest，START/END 事件通过 `evidenceUris` 保留证据引用。事件通过 SQLite Outbox 投递到 `runtime/fight-video/events.jsonl`。可用 `--no-evidence`、`--events`、`--outbox` 和 `--evidence-dir` 覆盖本地装配。
 
 换成自己的 MP4 时只需修改 `--video`。命令会输出每个窗口的 `fight_score`，并写入 `*-observations.jsonl` 与 `*-events.jsonl`。官方模型固定使用 8 帧窗口，`fight=1`；适配器始终取 `softmax(logits)[1]`，不会把非打架类的 top-1 置信度误当成打架分数。
 

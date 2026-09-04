@@ -20,7 +20,8 @@ class SettingsTests(unittest.TestCase):
         fight = load_fight_policy(runtime.fight_event_config)
         intrusion = load_intrusion_policy()
 
-        self.assertEqual(runtime.adapter, "opencv")
+        self.assertEqual(runtime.video_adapter, "opencv")
+        self.assertEqual(runtime.perception_adapter, "ultralytics")
         self.assertEqual(runtime.tracker_backend, "simple_iou")
         self.assertEqual((runtime.frame_count, runtime.sample_frequency), (8, 7))
         self.assertEqual(model.backend, "paddle")

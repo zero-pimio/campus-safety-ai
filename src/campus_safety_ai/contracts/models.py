@@ -146,6 +146,7 @@ class BehaviorObservation:
     score: float
     model_version: str
     subject_track_keys: tuple[str, ...] = ()
+    evidence_uris: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         iso_time(self.observed_at)
@@ -171,6 +172,7 @@ class BehaviorObservation:
             score=float(value["score"]),
             model_version=str(value["modelVersion"]),
             subject_track_keys=tuple(str(key) for key in value.get("subjectTrackKeys", [])),
+            evidence_uris=tuple(str(uri) for uri in value.get("evidenceUris", [])),
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -185,6 +187,7 @@ class BehaviorObservation:
             "score": self.score,
             "modelVersion": self.model_version,
             "subjectTrackKeys": list(self.subject_track_keys),
+            "evidenceUris": list(self.evidence_uris),
         }
 
 
@@ -210,6 +213,7 @@ class EventRecord:
     config_version: str
     idempotency_key: str
     status: str
+    evidence_uris: tuple[str, ...] = ()
 
     def to_dict(self) -> dict[str, Any]:
         value = asdict(self)
@@ -231,4 +235,5 @@ class EventRecord:
             "configVersion": value["config_version"],
             "idempotencyKey": value["idempotency_key"],
             "status": value["status"],
+            "evidenceUris": list(self.evidence_uris),
         }

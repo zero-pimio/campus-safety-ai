@@ -1,6 +1,7 @@
 schema_version = "1.0"
 runtime_version = "pc-dev-v1"
-adapter = "opencv"
+video_adapter = "opencv"
+perception_adapter = "ultralytics"
 tracker_backend = "simple_iou"
 precision = "fp32"
 device = "auto"

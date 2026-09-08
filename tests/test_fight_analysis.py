@@ -1,5 +1,5 @@
 import unittest
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, UTC
 
 from campus_safety_ai.contracts import BehaviorObservation
 from campus_safety_ai.core.fight_analysis import FightEventAnalysis, FightPolicy
@@ -7,7 +7,7 @@ from campus_safety_ai.core.fight_analysis import FightEventAnalysis, FightPolicy
 
 class FightAnalysisTests(unittest.TestCase):
     def setUp(self) -> None:
-        self.origin = datetime(2026, 8, 25, tzinfo=timezone.utc)
+        self.origin = datetime(2026, 8, 25, tzinfo=UTC)
         self.analysis = FightEventAnalysis(
             FightPolicy(
                 edge_id="edge-01",

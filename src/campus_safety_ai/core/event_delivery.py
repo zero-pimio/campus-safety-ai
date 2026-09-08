@@ -85,7 +85,7 @@ class EventDelivery:
     def close(self) -> None:
         self.connection.close()
 
-    def __enter__(self) -> "EventDelivery":
+    def __enter__(self) -> EventDelivery:
         return self
 
     def __exit__(self, exc_type: Any, exc_value: Any, traceback: Any) -> None:

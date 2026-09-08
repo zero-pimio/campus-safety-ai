@@ -1,12 +1,12 @@
 import unittest
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, UTC
 
 from campus_safety_ai.contracts import BehaviorObservation
 
 
 class BehaviorContractTests(unittest.TestCase):
     def test_round_trip(self) -> None:
-        observed = datetime(2026, 8, 25, tzinfo=timezone.utc)
+        observed = datetime(2026, 8, 25, tzinfo=UTC)
         value = BehaviorObservation(
             camera_id="gate-02",
             source_epoch=1,
@@ -23,7 +23,7 @@ class BehaviorContractTests(unittest.TestCase):
         self.assertEqual(BehaviorObservation.from_dict(value.to_dict()), value)
 
     def test_rejects_score_outside_probability_range(self) -> None:
-        observed = datetime(2026, 8, 25, tzinfo=timezone.utc)
+        observed = datetime(2026, 8, 25, tzinfo=UTC)
         with self.assertRaises(ValueError):
             BehaviorObservation(
                 camera_id="gate-02",

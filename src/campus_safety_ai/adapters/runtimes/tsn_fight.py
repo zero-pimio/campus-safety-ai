@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any
+from collections.abc import Sequence
 
 from campus_safety_ai.core.fight_inference import FightPrediction
 from campus_safety_ai.training.model import FightTsn

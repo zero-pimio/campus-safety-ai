@@ -2,9 +2,8 @@ from __future__ import annotations
 
 import argparse
 import json
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, UTC
 from pathlib import Path
-from typing import Any
 
 from campus_safety_ai.adapters.runtimes.ultralytics import UltralyticsPerception
 from campus_safety_ai.contracts import FramePacket
@@ -63,7 +62,7 @@ def visualize(
         capture.release()
         raise ValueError(f"cannot create output video: {output_path}")
 
-    origin = datetime(1970, 1, 1, tzinfo=timezone.utc)
+    origin = datetime(1970, 1, 1, tzinfo=UTC)
     frame_index = 0
     score_index = 0
     fight_score: float | None = None

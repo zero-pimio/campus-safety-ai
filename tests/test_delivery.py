@@ -1,6 +1,6 @@
 import tempfile
 import unittest
-from datetime import datetime, timezone
+from datetime import datetime, UTC
 from pathlib import Path
 
 from campus_safety_ai.contracts import EventRecord
@@ -9,7 +9,7 @@ from campus_safety_ai.core.event_delivery import EventDelivery, InMemoryDestinat
 
 class DeliveryTests(unittest.TestCase):
     def record(self) -> EventRecord:
-        now = datetime(2026, 8, 25, tzinfo=timezone.utc)
+        now = datetime(2026, 8, 25, tzinfo=UTC)
         return EventRecord(
             schema_version="1.0",
             event_id="event-1",

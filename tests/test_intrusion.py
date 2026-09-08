@@ -1,5 +1,5 @@
 import unittest
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, UTC
 
 from campus_safety_ai.contracts import BBox, Detection, Detections
 from campus_safety_ai.core.event_analysis import EventAnalysis, IntrusionPolicy
@@ -7,7 +7,7 @@ from campus_safety_ai.core.event_analysis import EventAnalysis, IntrusionPolicy
 
 class IntrusionTests(unittest.TestCase):
     def setUp(self) -> None:
-        self.started = datetime(2026, 8, 25, tzinfo=timezone.utc)
+        self.started = datetime(2026, 8, 25, tzinfo=UTC)
         self.analysis = EventAnalysis(
             IntrusionPolicy(
                 edge_id="edge-01",

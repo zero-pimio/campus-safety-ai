@@ -80,7 +80,9 @@ def evaluate(
             "dataset": sample.dataset,
             "group_id": sample.group_id,
         }
-        for sample, label, prediction, score in zip(samples, labels, predictions, fight_scores)
+        for sample, label, prediction, score in zip(
+            samples, labels, predictions, fight_scores, strict=True
+        )
         if label != prediction
     ]
     report: dict[str, Any] = {

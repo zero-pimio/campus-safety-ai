@@ -1,5 +1,5 @@
 import unittest
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, UTC
 
 from campus_safety_ai.contracts import BehaviorObservation
 from campus_safety_ai.core.fight_analysis import FightEventAnalysis, FightPolicy
@@ -7,7 +7,7 @@ from campus_safety_ai.core.fight_analysis import FightEventAnalysis, FightPolicy
 
 class FightFinalizeTests(unittest.TestCase):
     def setUp(self) -> None:
-        self.origin = datetime(2026, 8, 25, tzinfo=timezone.utc)
+        self.origin = datetime(2026, 8, 25, tzinfo=UTC)
         self.analysis = FightEventAnalysis(
             FightPolicy(
                 edge_id="edge-01",
@@ -73,8 +73,7 @@ class FightFinalizeTests(unittest.TestCase):
             )
         )
         self.assertEqual([record.phase for record in started], ["START"])
-        self.assertEqual([record.phase for record in reopened], [])
-        self.assertNotEqual(reopened and reopened[0].event_id, started[0].event_id)
+        self.assertEqual(reopened, [])
 
 
 if __name__ == "__main__":

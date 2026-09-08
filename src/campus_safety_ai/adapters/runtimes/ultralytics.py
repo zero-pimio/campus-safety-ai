@@ -27,6 +27,7 @@ class UltralyticsPerception:
                 result.boxes.xyxy.cpu().tolist(),
                 result.boxes.conf.cpu().tolist(),
                 result.boxes.cls.cpu().tolist(),
+                strict=True,
             ):
                 items.append(Detection(str(names[int(class_id)]), float(confidence), BBox.from_list(xyxy)))
         return Detections(

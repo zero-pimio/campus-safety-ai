@@ -1,6 +1,6 @@
 import importlib.util
 import unittest
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, UTC
 
 
 @unittest.skipUnless(
@@ -12,7 +12,7 @@ class ByteTrackAdapterTests(unittest.TestCase):
         from campus_safety_ai.adapters.runtimes.ultralytics_bytetrack import UltralyticsByteTracker
         from campus_safety_ai.contracts import BBox, Detection, Detections
 
-        origin = datetime(2026, 8, 25, tzinfo=timezone.utc)
+        origin = datetime(2026, 8, 25, tzinfo=UTC)
         tracker = UltralyticsByteTracker(track_buffer=2)
 
         def batch(sequence, detections):

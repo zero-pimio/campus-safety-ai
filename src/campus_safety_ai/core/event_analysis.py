@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from typing import Protocol
 from uuid import NAMESPACE_URL, uuid5
 
-from campus_safety_ai.contracts import BBox, Detection, Detections, EventRecord, Track
+from campus_safety_ai.contracts import BBox, Detections, EventRecord, Track
 
 
 def _iou(left: BBox, right: BBox) -> float:

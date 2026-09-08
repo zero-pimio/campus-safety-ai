@@ -1,5 +1,5 @@
 import unittest
-from datetime import datetime, timezone
+from datetime import datetime, UTC
 
 from campus_safety_ai.core.fight_analysis import FightEventAnalysis, FightPolicy
 from campus_safety_ai.core.fight_inference import FightPrediction
@@ -55,7 +55,7 @@ class FightPipelineTests(unittest.TestCase):
         )
 
         result = pipeline.run(
-            FakeSource(), "camera-01", 7, datetime(2026, 8, 25, tzinfo=timezone.utc)
+            FakeSource(), "camera-01", 7, datetime(2026, 8, 25, tzinfo=UTC)
         )
 
         self.assertEqual([record.phase for record in result.events], ["START", "END"])
@@ -82,7 +82,7 @@ class FightPipelineTests(unittest.TestCase):
         )
 
         result = pipeline.run(
-            FakeSource(), "camera-01", 7, datetime(2026, 8, 25, tzinfo=timezone.utc)
+            FakeSource(), "camera-01", 7, datetime(2026, 8, 25, tzinfo=UTC)
         )
 
         self.assertEqual([record.phase for record in result.events], ["START", "END"])

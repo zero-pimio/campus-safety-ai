@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
-from datetime import datetime, timezone
-from typing import Any, Literal
+from datetime import datetime, UTC
+from typing import Any, Literal, cast
 
 
 def parse_time(value: str) -> datetime:
@@ -15,7 +15,7 @@ def parse_time(value: str) -> datetime:
 def iso_time(value: datetime) -> str:
     if value.tzinfo is None:
         raise ValueError("timestamp must include a timezone")
-    return value.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+    return value.astimezone(UTC).isoformat().replace("+00:00", "Z")
 
 
 @dataclass(frozen=True)
@@ -30,7 +30,7 @@ class BBox:
             raise ValueError("bbox must have positive width and height")
 
     @classmethod
-    def from_list(cls, values: list[float]) -> "BBox":
+    def from_list(cls, values: list[float]) -> BBox:
         if len(values) != 4:
             raise ValueError("bboxXyxy must contain four numbers")
         return cls(*(float(value) for value in values))
@@ -72,7 +72,7 @@ class Detection:
             raise ValueError("confidence must be between 0 and 1")
 
     @classmethod
-    def from_dict(cls, value: dict[str, Any]) -> "Detection":
+    def from_dict(cls, value: dict[str, Any]) -> Detection:
         return cls(
             label=str(value["label"]),
             confidence=float(value["confidence"]),
@@ -96,7 +96,7 @@ class Detections:
     inference_ms: float
 
     @classmethod
-    def from_dict(cls, value: dict[str, Any]) -> "Detections":
+    def from_dict(cls, value: dict[str, Any]) -> Detections:
         return cls(
             camera_id=str(value["cameraId"]),
             source_epoch=int(value["sourceEpoch"]),
@@ -160,7 +160,7 @@ class BehaviorObservation:
             raise ValueError("behavior score must be between 0 and 1")
 
     @classmethod
-    def from_dict(cls, value: dict[str, Any]) -> "BehaviorObservation":
+    def from_dict(cls, value: dict[str, Any]) -> BehaviorObservation:
         return cls(
             camera_id=str(value["cameraId"]),
             source_epoch=int(value["sourceEpoch"]),
@@ -214,6 +214,50 @@ class EventRecord:
     idempotency_key: str
     status: str
     evidence_uris: tuple[str, ...] = ()
+
+    def __post_init__(self) -> None:
+        if self.revision < 1:
+            raise ValueError("event revision must start at 1")
+        if not self.event_id or not self.idempotency_key:
+            raise ValueError("event_id and idempotency_key must be non-empty")
+        if not self.status:
+            raise ValueError("event status must be non-empty")
+        if self.phase not in ("START", "UPDATE", "END"):
+            raise ValueError("event phase must be START, UPDATE, or END")
+        if not 0 <= self.confidence <= 1:
+            raise ValueError("event confidence must be between 0 and 1")
+        iso_time(self.started_at)
+        iso_time(self.observed_at)
+        if self.phase == "END":
+            if self.ended_at is None:
+                raise ValueError("END records require ended_at")
+            iso_time(self.ended_at)
+        elif self.ended_at is not None:
+            raise ValueError("only END records may carry ended_at")
+
+    @classmethod
+    def from_dict(cls, value: dict[str, Any]) -> EventRecord:
+        ended_at = value.get("endedAt")
+        return cls(
+            schema_version=str(value["schemaVersion"]),
+            event_id=str(value["eventId"]),
+            revision=int(value["revision"]),
+            phase=cast(EventPhase, str(value["phase"])),
+            event_type=str(value["eventType"]),
+            severity=str(value["severity"]),
+            edge_id=str(value["edgeId"]),
+            camera_id=str(value["cameraId"]),
+            started_at=parse_time(value["startedAt"]),
+            observed_at=parse_time(value["observedAt"]),
+            ended_at=parse_time(ended_at) if ended_at else None,
+            subject_track_keys=tuple(str(key) for key in value.get("subjectTrackKeys", [])),
+            confidence=float(value["confidence"]),
+            model_version=str(value["modelVersion"]),
+            config_version=str(value["configVersion"]),
+            idempotency_key=str(value["idempotencyKey"]),
+            status=str(value["status"]),
+            evidence_uris=tuple(str(uri) for uri in value.get("evidenceUris", [])),
+        )
 
     def to_dict(self) -> dict[str, Any]:
         value = asdict(self)

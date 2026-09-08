@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass, replace
 from datetime import datetime, timedelta
-from typing import Any, Iterable, Protocol, Sequence
+from typing import Any, Protocol
+from collections.abc import Iterable, Sequence
 
 from campus_safety_ai.contracts import BehaviorObservation, EventRecord
 from campus_safety_ai.core.fight_analysis import FightEventAnalysis

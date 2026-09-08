@@ -58,7 +58,7 @@ def _sample_frames(
 
     edges = np.linspace(0, total, frame_count + 1, dtype=np.int64)
     indices: list[int] = []
-    for left, right in zip(edges[:-1], edges[1:]):
+    for left, right in zip(edges[:-1], edges[1:], strict=False):
         upper = max(int(left) + 1, int(right))
         index = random.randrange(int(left), upper) if training else (int(left) + upper - 1) // 2
         indices.append(min(index, total - 1))

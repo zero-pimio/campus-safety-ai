@@ -1,5 +1,5 @@
 import unittest
-from datetime import datetime, timezone
+from datetime import datetime, UTC
 
 from campus_safety_ai.contracts import BBox, Detection, Detections
 
@@ -10,7 +10,7 @@ class ContractTests(unittest.TestCase):
             camera_id="gate-02",
             source_epoch=1,
             sequence=2,
-            captured_at=datetime(2026, 8, 25, tzinfo=timezone.utc),
+            captured_at=datetime(2026, 8, 25, tzinfo=UTC),
             width=1000,
             height=1000,
             detections=(Detection("person", 0.9, BBox(500, 100, 700, 800)),),

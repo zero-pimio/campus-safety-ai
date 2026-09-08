@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Iterator
+from typing import Any
+from collections.abc import Iterator
 from urllib.parse import urlparse, urlunparse
 
 from campus_safety_ai.core.fight_pipeline import VideoWindow
@@ -75,7 +76,7 @@ class OpenCvVideoSource:
             self._capture.release()
             self._closed = True
 
-    def __enter__(self) -> "OpenCvVideoSource":
+    def __enter__(self) -> OpenCvVideoSource:
         return self
 
     def __exit__(self, exc_type: Any, exc_value: Any, traceback: Any) -> None:

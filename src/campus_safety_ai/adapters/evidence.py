@@ -3,7 +3,8 @@ from __future__ import annotations
 import json
 import re
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any
+from collections.abc import Sequence
 
 from campus_safety_ai.contracts import BehaviorObservation
 

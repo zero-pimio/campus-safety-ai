@@ -1,7 +1,7 @@
 import json
 import tempfile
 import unittest
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, UTC
 from pathlib import Path
 
 from campus_safety_ai.contracts import BBox, Detection, Detections
@@ -29,7 +29,7 @@ def batch(
 
 class IntrusionFinalizeTests(unittest.TestCase):
     def setUp(self) -> None:
-        self.origin = datetime(2026, 8, 25, tzinfo=timezone.utc)
+        self.origin = datetime(2026, 8, 25, tzinfo=UTC)
         self.analysis = EventAnalysis(
             IntrusionPolicy(
                 edge_id="edge-01",
@@ -64,7 +64,7 @@ class IntrusionFinalizeTests(unittest.TestCase):
 
 class TrackerTests(unittest.TestCase):
     def setUp(self) -> None:
-        self.origin = datetime(2026, 8, 25, tzinfo=timezone.utc)
+        self.origin = datetime(2026, 8, 25, tzinfo=UTC)
         self.tracker = SimpleIoUTracker(iou_threshold=0.25, max_gap_seconds=2.0)
 
     def test_same_object_keeps_one_track_key(self) -> None:
@@ -124,7 +124,7 @@ class TrackerTests(unittest.TestCase):
 
 class LostTrackClosureTests(unittest.TestCase):
     def test_open_intrusion_closes_when_track_expires(self) -> None:
-        origin = datetime(2026, 8, 25, tzinfo=timezone.utc)
+        origin = datetime(2026, 8, 25, tzinfo=UTC)
         analysis = EventAnalysis(
             IntrusionPolicy(
                 edge_id="edge-01",
@@ -151,7 +151,7 @@ class DeliveryContextTests(unittest.TestCase):
         from campus_safety_ai.contracts import EventRecord
         from campus_safety_ai.core.event_delivery import EventDelivery, InMemoryDestination
 
-        now = datetime(2026, 8, 25, tzinfo=timezone.utc)
+        now = datetime(2026, 8, 25, tzinfo=UTC)
         record = EventRecord(
             schema_version="1.0",
             event_id="event-1",

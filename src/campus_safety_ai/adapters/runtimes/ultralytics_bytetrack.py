@@ -54,7 +54,20 @@ class UltralyticsByteTracker:
         from ultralytics.engine.results import Boxes
 
         epoch = (batch.camera_id, batch.source_epoch)
+        expired_keys: list[str] = []
         if epoch != self._epoch:
+            if self._epoch is not None and self._tracker is not None:
+                # Tracks cannot cross a source epoch (CONTEXT.md); report every
+                # live or lost track so open events get closed instead of leaked.
+                old_camera, old_epoch = self._epoch
+                live_stracks = (
+                    *getattr(self._tracker, "tracked_stracks", ()),
+                    *getattr(self._tracker, "lost_stracks", ()),
+                )
+                expired_keys = [
+                    self._track_key(old_camera, old_epoch, int(track.track_id))
+                    for track in live_stracks
+                ]
             self._reset(epoch)
         assert self._tracker is not None
 
@@ -89,8 +102,8 @@ class UltralyticsByteTracker:
         removed_ids = {int(track.track_id) for track in self._tracker.removed_stracks}
         newly_removed = removed_ids - self._reported_removed
         self._reported_removed.update(newly_removed)
-        expired = tuple(
+        expired_keys.extend(
             self._track_key(batch.camera_id, batch.source_epoch, track_id)
             for track_id in sorted(newly_removed)
         )
-        return TrackingResult(tracks, expired)
+        return TrackingResult(tracks, tuple(dict.fromkeys(expired_keys)))

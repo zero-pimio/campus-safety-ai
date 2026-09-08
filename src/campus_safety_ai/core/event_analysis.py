@@ -42,6 +42,8 @@ class IntrusionPolicy:
     cooldown_seconds: float = 10.0
     minimum_confidence: float = 0.4
     config_version: str = "intrusion-v1"
+    event_type: str = "intrusion"
+    target_label: str = "person"
 
     def __post_init__(self) -> None:
         if len(self.polygon) < 3:
@@ -85,16 +87,21 @@ class SimpleIoUTracker:
 
     def update(self, batch: Detections) -> TrackingResult:
         epoch = (batch.camera_id, batch.source_epoch)
+        expired: list[str] = []
         if self._epoch != epoch:
+            if self._epoch is not None:
+                # Tracks cannot cross a source epoch (CONTEXT.md); report them so
+                # open events held by vanished tracks get closed instead of leaked.
+                old_camera, old_epoch = self._epoch
+                expired.extend(
+                    self._track_key(old_camera, old_epoch, key) for key in sorted(self._objects)
+                )
             self._objects.clear()
             self._next_id = 1
             self._epoch = epoch
-
-        expired = tuple(
-            self._track_key(batch.camera_id, batch.source_epoch, key)
-            for key, value in self._objects.items()
-            if (batch.captured_at - value.last_seen).total_seconds() > self.max_gap_seconds
-        )
+        for key, value in self._objects.items():
+            if (batch.captured_at - value.last_seen).total_seconds() > self.max_gap_seconds:
+                expired.append(self._track_key(batch.camera_id, batch.source_epoch, key))
         self._objects = {
             key: value
             for key, value in self._objects.items()
@@ -126,7 +133,7 @@ class SimpleIoUTracker:
                     observed_at=batch.captured_at,
                 )
             )
-        return TrackingResult(tuple(result), expired)
+        return TrackingResult(tuple(result), tuple(expired))
 
 
 @dataclass
@@ -164,7 +171,7 @@ class EventAnalysis:
                 self._ending_record(batch.camera_id, batch.captured_at, track_key, 0.0, state)
             )
         for track in tracking.tracks:
-            if track.label != "person" or track.confidence < self.policy.minimum_confidence:
+            if track.label != self.policy.target_label or track.confidence < self.policy.minimum_confidence:
                 continue
             state = self._states.setdefault(track.track_key, _IntrusionState())
             point = track.bbox.bottom_center_normalized(batch.width, batch.height)
@@ -202,18 +209,15 @@ class EventAnalysis:
         for key in sorted(self._states):
             if not key.startswith(prefix):
                 continue
-            state = self._states[key]
+            # The epoch is over: closed states can never produce events again,
+            # so dropping them keeps long-running services from growing forever.
+            state = self._states.pop(key)
             if state.event_id is None:
                 continue
             state.revision += 1
             records.append(
                 self._ending_record(camera_id, ended_at, key, 0.0, state)
             )
-            state.cooldown_until = ended_at + timedelta(seconds=self.policy.cooldown_seconds)
-            state.event_id = None
-            state.started_at = None
-            state.entered_at = None
-            state.outside_since = None
         return records
 
     def _ending_record(
@@ -230,7 +234,7 @@ class EventAnalysis:
             event_id=state.event_id,
             revision=state.revision,
             phase="END",
-            event_type="intrusion",
+            event_type=self.policy.event_type,
             severity="warning",
             edge_id=self.policy.edge_id,
             camera_id=camera_id,
@@ -264,7 +268,7 @@ class EventAnalysis:
             event_id=state.event_id,
             revision=state.revision,
             phase=phase,  # type: ignore[arg-type]
-            event_type="intrusion",
+            event_type=self.policy.event_type,
             severity="warning",
             edge_id=self.policy.edge_id,
             camera_id=batch.camera_id,

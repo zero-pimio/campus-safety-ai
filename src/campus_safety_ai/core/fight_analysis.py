@@ -17,6 +17,8 @@ class FightPolicy:
     clear_seconds: float = 2.0
     cooldown_seconds: float = 10.0
     config_version: str = "fight-v1"
+    behavior_label: str = "fighting"
+    event_type: str = "person_fighting"
 
     def __post_init__(self) -> None:
         if not 0 <= self.end_score < self.start_score <= 1:
@@ -58,7 +60,7 @@ class FightEventAnalysis:
         self._last_sequence: dict[tuple[str, int], int] = {}
 
     def advance(self, observation: BehaviorObservation) -> list[EventRecord]:
-        if observation.behavior != "fighting":
+        if observation.behavior != self.policy.behavior_label:
             return []
 
         stream = (observation.camera_id, observation.source_epoch)
@@ -161,7 +163,7 @@ class FightEventAnalysis:
             event_id=state.event_id,
             revision=state.revision,
             phase=phase,
-            event_type="person_fighting",
+            event_type=self.policy.event_type,
             severity="critical",
             edge_id=self.policy.edge_id,
             camera_id=observation.camera_id,

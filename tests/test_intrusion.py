@@ -50,6 +50,36 @@ class IntrusionTests(unittest.TestCase):
         self.analysis.advance(self.batch(0, inside, 1))
         self.assertEqual(self.analysis.advance(self.batch(5, inside, 1)), [])
 
+    def test_policy_event_type_and_target_label_drive_records(self) -> None:
+        analysis = EventAnalysis(
+            IntrusionPolicy(
+                edge_id="edge-01",
+                zone_id="all",
+                polygon=((0, 0), (1, 0), (1, 1), (0, 1)),
+                enter_seconds=0,
+                cooldown_seconds=0,
+                event_type="perimeter_breach",
+                target_label="person",
+            )
+        )
+        inside = BBox(550, 100, 750, 800)
+        vehicle = Detections(
+            camera_id="gate-02",
+            source_epoch=1,
+            sequence=1,
+            captured_at=self.started,
+            width=1000,
+            height=1000,
+            detections=(Detection("car", 0.9, inside),),
+            model_version="fake-v1",
+            inference_ms=1,
+        )
+
+        self.assertEqual(analysis.advance(vehicle), [])
+        started = analysis.advance(self.batch(0, inside, sequence=2))
+        self.assertEqual([record.phase for record in started], ["START"])
+        self.assertEqual(started[0].event_type, "perimeter_breach")
+
 
 if __name__ == "__main__":
     unittest.main()

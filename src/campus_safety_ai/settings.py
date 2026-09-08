@@ -68,6 +68,8 @@ def load_fight_policy(
         clear_seconds=float(value["clear_seconds"]),
         cooldown_seconds=float(value["cooldown_seconds"]),
         config_version=str(value["config_version"]),
+        behavior_label=str(value.get("behavior_label", "fighting")),
+        event_type=str(value.get("event_type", "person_fighting")),
     )
 
 
@@ -78,6 +80,7 @@ def load_intrusion_policy(
     event = _read(event_path)
     scene = _read(scene_path)
     zone = scene["intrusion_zone"]
+    target_labels = [str(label) for label in event.get("target_labels", ["person"])]
     return IntrusionPolicy(
         edge_id=str(event.get("edge_id", "edge-dev-01")),
         zone_id=str(zone["zone_id"]),
@@ -87,6 +90,8 @@ def load_intrusion_policy(
         cooldown_seconds=float(event["cooldown_seconds"]),
         minimum_confidence=float(event["minimum_confidence"]),
         config_version=str(event["config_version"]),
+        event_type=str(event.get("event_type", "intrusion")),
+        target_label=target_labels[0] if target_labels else "person",
     )
 
 

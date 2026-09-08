@@ -26,15 +26,6 @@ from campus_safety_ai.settings import (
 )
 
 
-def read_video_windows(
-    video_path: str | Path, frame_len: int = 8, sample_frequency: int = 7
-) -> tuple[float, int, OpenCvVideoSource]:
-    """Compatibility wrapper around the OpenCV video-source adapter."""
-
-    source = OpenCvVideoSource(video_path, frame_len, sample_frequency)
-    return source.fps, source.sample_frequency, source
-
-
 def _execute(
     video_path: str | Path,
     classifier: FightClassifier,

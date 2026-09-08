@@ -72,7 +72,7 @@ class FightVideoPipeline:
                 observed_at=window_ended_at,
                 window_started_at=window_started_at,
                 window_ended_at=window_ended_at,
-                behavior="fighting",
+                behavior=self.analysis.policy.behavior_label,
                 score=prediction.fight_score,
                 model_version=self.classifier.model_version,
             )

@@ -13,10 +13,11 @@ def batch(
     captured_at: datetime,
     detections: tuple[Detection, ...],
     camera_id: str = "gate-02",
+    source_epoch: int = 1,
 ) -> Detections:
     return Detections(
         camera_id=camera_id,
-        source_epoch=1,
+        source_epoch=source_epoch,
         sequence=sequence,
         captured_at=captured_at,
         width=1000,
@@ -60,6 +61,30 @@ class IntrusionFinalizeTests(unittest.TestCase):
         self.analysis.advance(batch(1, self.origin, (other,), camera_id="gate-03"))
         self.analysis.advance(batch(2, self.origin + timedelta(seconds=2), (other,), camera_id="gate-03"))
         self.assertEqual(self.analysis.finalize("gate-02", 1, self.origin), [])
+
+    def test_finalize_discards_states_so_services_do_not_leak(self) -> None:
+        inside = Detection("person", 0.9, BBox(550, 100, 750, 800))
+        self.analysis.advance(batch(1, self.origin, (inside,)))
+        self.analysis.advance(batch(2, self.origin + timedelta(seconds=2), (inside,)))
+
+        self.analysis.finalize("gate-02", 1, self.origin + timedelta(seconds=30))
+
+        self.assertEqual(self.analysis._states, {})
+
+    def test_source_epoch_change_closes_open_event(self) -> None:
+        inside = Detection("person", 0.9, BBox(550, 100, 750, 800))
+        self.analysis.advance(batch(1, self.origin, (inside,)))
+        started = self.analysis.advance(batch(2, self.origin + timedelta(seconds=2), (inside,)))
+        self.assertEqual([record.phase for record in started], ["START"])
+
+        # Camera reconnect: same camera, new source epoch, first frame of the new session.
+        ended = self.analysis.advance(
+            batch(1, self.origin + timedelta(seconds=30), (inside,), source_epoch=2)
+        )
+
+        self.assertEqual([record.phase for record in ended], ["END"])
+        self.assertEqual(ended[0].event_id, started[0].event_id)
+        self.assertFalse(any(key.startswith("gate-02:1:") for key in self.analysis._states))
 
 
 class TrackerTests(unittest.TestCase):
@@ -118,6 +143,16 @@ class TrackerTests(unittest.TestCase):
         key = self.tracker.update(first).tracks[0].track_key
 
         expired = self.tracker.update(batch(2, self.origin + timedelta(seconds=3), ()))
+
+        self.assertEqual(expired.expired_track_keys, (key,))
+
+    def test_source_epoch_switch_reports_old_tracks_as_expired(self) -> None:
+        first = batch(1, self.origin, (Detection("person", 0.9, BBox(100, 100, 200, 300)),))
+        key = self.tracker.update(first).tracks[0].track_key
+
+        expired = self.tracker.update(
+            batch(1, self.origin + timedelta(seconds=1), (), source_epoch=2)
+        )
 
         self.assertEqual(expired.expired_track_keys, (key,))
 

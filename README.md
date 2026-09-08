@@ -8,7 +8,7 @@ FramePacket → Detections → Tracks → EventRecord → SQLite Outbox → Dest
 
 当前可运行能力：
 
-- 五类稳定契约中的 `FramePacket`、`Detections`、`Track`、`EventRecord`；
+- 五类稳定契约 `FramePacket`、`Detections`、`Track`、`BehaviorObservation`、`EventRecord` 全部带校验与序列化对称；
 - 可配置的简单 IoU / Ultralytics ByteTrack 跟踪 adapter；轨迹超时会主动收口事件；
 - 使用真实时间戳的人员非法闯入状态机；
 - 归一化多边形禁区、底部中心点判定、进入/离开延时和冷却；

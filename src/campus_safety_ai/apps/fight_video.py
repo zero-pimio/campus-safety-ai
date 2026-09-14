@@ -7,13 +7,14 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
 
+from campus_safety_ai.adapters.easyaiot import build_platform_destination
 from campus_safety_ai.adapters.evidence import DirectoryEvidenceSink, NullEvidenceSink
 from campus_safety_ai.adapters.runtimes.fight_factory import build_fight_classifier
 from campus_safety_ai.adapters.runtimes.paddle_fight import PaddlePpTsmFightClassifier
 from campus_safety_ai.adapters.video_sources import OpenCvVideoSource, redact_video_source
 from campus_safety_ai.apps.fight_replay import default_fight_analysis
 from campus_safety_ai.contracts import iso_time, parse_time
-from campus_safety_ai.core.event_delivery import EventDelivery, JsonlDestination
+from campus_safety_ai.core.event_delivery import Destination, EventDelivery, JsonlDestination
 from campus_safety_ai.core.fight_analysis import FightEventAnalysis
 from campus_safety_ai.core.fight_inference import FightClassifier
 from campus_safety_ai.core.fight_pipeline import EvidenceSink, FightPipelineResult, FightVideoPipeline
@@ -96,6 +97,7 @@ def run(
     sample_frequency: int = 7,
     events_path: Path | None = None,
     outbox_path: Path | None = None,
+    destination: Destination | None = None,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     classifier = classifier or PaddlePpTsmFightClassifier(model_dir)
     result = _execute(
@@ -116,7 +118,10 @@ def run(
     events_path = events_path or output_dir / f"{stem}-events.jsonl"
     outbox_path = outbox_path or events_path.with_suffix(".sqlite3")
     _write_jsonl(observations_path, observations)
-    with EventDelivery(outbox_path, JsonlDestination(events_path)) as delivery:
+    with EventDelivery(
+        outbox_path,
+        destination or JsonlDestination(events_path),
+    ) as delivery:
         delivery.submit(list(result.events))
 
     for item in observations:
@@ -146,6 +151,7 @@ def main() -> None:
         type=Path,
         default=PROJECT_ROOT / "configs/runtimes/pc-dev.toml",
     )
+    parser.add_argument("--platform-config", type=Path)
     parser.add_argument("--model-config", type=Path)
     parser.add_argument(
         "--model-dir", type=Path, help="legacy override for a Paddle PP-TSM directory"
@@ -175,7 +181,7 @@ def main() -> None:
         else build_fight_classifier(load_fight_model_settings(model_config))
     )
     policy = load_fight_policy(runtime.fight_event_config)
-    platform = load_platform_settings(runtime.platform_config)
+    platform = load_platform_settings(arguments.platform_config or runtime.platform_config)
     evidence_dir = arguments.evidence_dir or runtime.evidence_dir
     evidence = (
         NullEvidenceSink()
@@ -183,6 +189,9 @@ def main() -> None:
         else DirectoryEvidenceSink(evidence_dir, policy.start_score)
     )
     print(f"video_started_at={iso_time(started_at)}")
+    events_path = arguments.events or platform.events
+    outbox_path = arguments.outbox or platform.outbox
+    destination = build_platform_destination(platform, events_path=events_path)
     run(
         arguments.video,
         arguments.model_dir or Path("models/ppTSM"),
@@ -195,8 +204,9 @@ def main() -> None:
         source_epoch=arguments.source_epoch,
         frame_len=runtime.frame_count,
         sample_frequency=runtime.sample_frequency,
-        events_path=arguments.events or platform.events,
-        outbox_path=arguments.outbox or platform.outbox,
+        events_path=events_path,
+        outbox_path=outbox_path,
+        destination=destination,
     )
 
 

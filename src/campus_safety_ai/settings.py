@@ -35,9 +35,15 @@ class FightModelSettings:
 
 @dataclass(frozen=True)
 class PlatformSettings:
-    destination: Literal["jsonl"]
+    destination: Literal["jsonl", "easyaiot"]
     outbox: Path
     events: Path
+    easyaiot_endpoint: str | None = None
+    easyaiot_token_env: str | None = "EASYAIOT_TOKEN"
+    easyaiot_timeout_seconds: float = 10.0
+    easyaiot_device_name: str | None = None
+    easyaiot_object: str = "person"
+    easyaiot_task_type: Literal["realtime", "snap"] = "realtime"
 
 
 @dataclass(frozen=True)
@@ -117,12 +123,40 @@ def load_platform_settings(
 ) -> PlatformSettings:
     value = _read(path)
     destination = str(value["destination"])
-    if destination != "jsonl":
+    if destination not in {"jsonl", "easyaiot"}:
         raise ValueError(f"unsupported local destination: {destination}")
+    easyaiot = value.get("easyaiot", {})
+    if not isinstance(easyaiot, dict):
+        raise ValueError("easyaiot platform settings must be a table")
+    endpoint_value = easyaiot.get("endpoint")
+    endpoint = str(endpoint_value).strip() if endpoint_value else None
+    if destination == "easyaiot" and not endpoint:
+        raise ValueError("EasyAIoT destination requires easyaiot.endpoint")
+    timeout_seconds = float(easyaiot.get("timeout_seconds", 10.0))
+    if timeout_seconds <= 0:
+        raise ValueError("easyaiot.timeout_seconds must be positive")
+    task_type = str(easyaiot.get("task_type", "realtime"))
+    if task_type == "snapshot":
+        task_type = "snap"
+    if task_type not in {"realtime", "snap"}:
+        raise ValueError(f"unsupported EasyAIoT task type: {task_type}")
+    object_label = str(easyaiot.get("object", "person")).strip()
+    if not object_label:
+        raise ValueError("easyaiot.object must be non-empty")
+    device_name_value = easyaiot.get("device_name")
+    device_name = str(device_name_value).strip() if device_name_value else None
+    token_env_value = easyaiot.get("token_env", "EASYAIOT_TOKEN")
+    token_env = str(token_env_value).strip() if token_env_value else None
     return PlatformSettings(
-        destination="jsonl",
+        destination=destination,  # type: ignore[arg-type]
         outbox=_path(str(value["outbox"]), project_root),
         events=_path(str(value["events"]), project_root),
+        easyaiot_endpoint=endpoint,
+        easyaiot_token_env=token_env,
+        easyaiot_timeout_seconds=timeout_seconds,
+        easyaiot_device_name=device_name,
+        easyaiot_object=object_label,
+        easyaiot_task_type=task_type,  # type: ignore[arg-type]
     )
 
 

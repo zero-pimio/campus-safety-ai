@@ -80,6 +80,46 @@ class SettingsTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "schema_version"):
                 load_fight_model_settings(path)
 
+    def test_easyaiot_platform_settings_keep_endpoint_and_secret_reference(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "easyaiot.toml"
+            path.write_text(
+                'schema_version = "1.0"\n'
+                'destination = "easyaiot"\n'
+                'outbox = "runtime/outbox.sqlite3"\n'
+                'events = "runtime/events.jsonl"\n'
+                "\n"
+                "[easyaiot]\n"
+                'endpoint = "https://easyaiot.test/admin-api/video/alert/hook"\n'
+                'token_env = "TEST_EASYAIOT_TOKEN"\n'
+                "timeout_seconds = 4\n"
+                'device_name = "东门"\n'
+                'object = "person"\n'
+                'task_type = "realtime"\n',
+                encoding="utf-8",
+            )
+
+            settings = load_platform_settings(path, Path(directory))
+
+            self.assertEqual(settings.destination, "easyaiot")
+            self.assertEqual(settings.easyaiot_endpoint, "https://easyaiot.test/admin-api/video/alert/hook")
+            self.assertEqual(settings.easyaiot_token_env, "TEST_EASYAIOT_TOKEN")
+            self.assertEqual(settings.easyaiot_timeout_seconds, 4)
+            self.assertEqual(settings.easyaiot_device_name, "东门")
+
+    def test_easyaiot_requires_endpoint(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "easyaiot.toml"
+            path.write_text(
+                'schema_version = "1.0"\n'
+                'destination = "easyaiot"\n'
+                'outbox = "outbox.sqlite3"\n'
+                'events = "events.jsonl"\n',
+                encoding="utf-8",
+            )
+            with self.assertRaisesRegex(ValueError, "endpoint"):
+                load_platform_settings(path, Path(directory))
+
 
 if __name__ == "__main__":
     unittest.main()

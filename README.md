@@ -21,6 +21,7 @@ FramePacket → Detections → Tracks → EventRecord → SQLite Outbox → Dest
 - 同一 `FightClassifier` interface 下的 Paddle、PyTorch checkpoint 和 ONNX Runtime adapter；
 - OpenCV 本地视频/RTSP 视频源 adapter、SQLite Outbox、JSONL 目标和截图/采样短片证据；
 - TOML 驱动的事件、模型、运行时和投递配置，以及固定 split 的模型评估报告。
+- EasyAIoT `/alert/hook` adapter：保留本项目 `EventRecord`，转换为 EasyAIoT 告警字段并通过 SQLite Outbox 投递；鉴权 token 只从环境变量读取。
 
 当前边界：本地 MP4、三种 PC 模型运行时、ByteTrack adapter 和本地证据已跑通；RTSP adapter 已实现但尚未用真实摄像头长稳验收。OpenRemote/MQTT、RKNN/昇腾板卡、校园数据精度和证据保留策略仍未验证。这些属于后续门禁，不能把本骨架当成已部署系统。
 
@@ -129,6 +130,19 @@ python -m pip install -e '.[vision,dev]'
 ```
 
 人员打架是当前第一条实现主线；跌倒、超速、骑车看手机、追逐和 Mage-VL 复核后移。详细门禁见 [docs/ROADMAP.md](docs/ROADMAP.md)，事件语义见 [打架规格](docs/event-specs/fight-v1.md)和[闯入规格](docs/event-specs/intrusion-v1.md)。
+
+## 接入 EasyAIoT
+
+EasyAIoT 负责设备、视频、节点和运营侧；本项目负责打架/闯入事件的时间语义与可靠投递。使用 [EasyAIoT 平台配置](configs/platform/easyaiot-dev.toml) 时，先确认 EasyAIoT 已为对应设备启用实时告警任务，并将 token 放入环境变量：
+
+```bash
+export EASYAIOT_TOKEN="..."
+PYTHONPATH=src .venv/bin/python -m campus_safety_ai.apps.fight_video \
+  --video datasets/samples/fight-fi001.mp4 \
+  --platform-config configs/platform/easyaiot-dev.toml
+```
+
+适配器 POST 到 EasyAIoT 的 `/admin-api/video/alert/hook`，发送 `device_id`、`event`、`information`、`image_path`、`record_path`、`task_type` 和 `correlation_id`。`information.eventRecord` 保留完整的 `START/UPDATE/END` 事件；EasyAIoT 不可用时，Outbox 行保持未投递，下一次 flush 可重试。当前仅完成协议适配，真实 EasyAIoT 服务、摄像头长稳、MinIO 路径共享和通知闭环仍需现场验收。
 
 项目总体范围、深模块设计、数据与测试体系、16 周执行计划、风险和当前真实状态见 [总项目规划](docs/PROJECT-PLAN.md)；统一领域术语见 [CONTEXT.md](CONTEXT.md)。
 

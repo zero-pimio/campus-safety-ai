@@ -1,0 +1,15 @@
+schema_version = "1.0"
+destination = "easyaiot"
+outbox = "runtime/fight-video/easyaiot-outbox.sqlite3"
+# Kept for CLI compatibility; EasyAIoT delivery does not write this JSONL file.
+events = "runtime/fight-video/easyaiot-events.jsonl"
+
+[easyaiot]
+# EasyAIoT VIDEO gateway route for POST /alert/hook.
+endpoint = "http://localhost:48080/admin-api/video/alert/hook"
+# The token value stays outside the repository.
+token_env = "EASYAIOT_TOKEN"
+timeout_seconds = 10
+device_name = ""
+object = "person"
+task_type = "realtime"

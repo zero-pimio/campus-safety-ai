@@ -1,0 +1,557 @@
+{
+  "scope": "Unused by current fight training and replay, not a claim of no future research value",
+  "recovery_directory": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853",
+  "status": "complete",
+  "manifest_sha256": "9072e283bf064ab8fdf09d9f129992f6bf780a019fcbb929e64028199f652fc5",
+  "files": [
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam1/108.mp4",
+      "bytes": 3407293,
+      "sha256": "cf6c465d0c2caa5a359be6436c1ab4352c61b5ab532317b99479634bd7da48aa",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam1/108.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam1/110.mp4",
+      "bytes": 2355669,
+      "sha256": "7d47238a8ec20748d7bc947d8bf441da09074d10e8c8de1eb25fdc9000d4a6a8",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam1/110.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam1/114.mp4",
+      "bytes": 2735896,
+      "sha256": "fc4ec9f857dd0f66bd722cc76bcd735eaa7c08cc45abecc7e33caa9e998d0c70",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam1/114.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam1/14.mp4",
+      "bytes": 1969869,
+      "sha256": "2a751d87746adda7c63c0c55a67eccca5d956dd1dd46ec51e431bfd27cf08731",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam1/14.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam1/16.mp4",
+      "bytes": 3804832,
+      "sha256": "d8b2d1ea3ba9f29128a18ea6e4a54e88d209e0226555a65409615e39f81acd21",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam1/16.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam1/17.mp4",
+      "bytes": 2191565,
+      "sha256": "9a8fb798fda9f1502c885cdad725df6beb946336d7bd8f8783ae5410904cc54b",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam1/17.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam1/18.mp4",
+      "bytes": 3208396,
+      "sha256": "8d98ec1a60c3650fad0fe3e2998521995a68eed1b2e5f7cefef4f6dbf8ea183c",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam1/18.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam1/19.mp4",
+      "bytes": 2896125,
+      "sha256": "841e7c1e9cd60450247dc4c4bacb55664e40a3a350f716d02ce1783695d4b96f",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam1/19.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam1/20.mp4",
+      "bytes": 1789914,
+      "sha256": "f1f3cc28702d1b177259ac2d64f5060f7e9e7244794d40464646335f744c6cd2",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam1/20.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam1/21.mp4",
+      "bytes": 3145053,
+      "sha256": "0d9329c155090351bf63f3d50ca71c367438870a0e75d00db6dd8790b9afda1a",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam1/21.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam1/29.mp4",
+      "bytes": 2611392,
+      "sha256": "65de032a96c65681a231ca716108cde965147de9949a3f4906058087f21d630b",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam1/29.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam1/4.mp4",
+      "bytes": 1979575,
+      "sha256": "c15976a5799e28364ff2c5365e028404031e1af71850caedfe1ec271d8c46d0d",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam1/4.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam1/5.mp4",
+      "bytes": 2511968,
+      "sha256": "52eb652492a3905e7f03e5bc3675360555bfd57fc638d2ebd2d3a711131da264",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam1/5.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam1/51.mp4",
+      "bytes": 4406582,
+      "sha256": "ba70b17e471066667b0f270c938015f0fca03656e7cf5984b3eda95f0e53615f",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam1/51.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam1/52.mp4",
+      "bytes": 2016819,
+      "sha256": "118fb203a0fc7efb13c9685cf62cbea69eb238effdcb80028a200a20923657c8",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam1/52.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam1/54.mp4",
+      "bytes": 5946404,
+      "sha256": "9dd9b7ad89bfff4bb9cd10162c68f6010d9c02f10608e79d0a50800888d3980d",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam1/54.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam1/57.mp4",
+      "bytes": 3513007,
+      "sha256": "0d3a83601affc451137484891c3b14a63c2d9237c61fe91a4cf51eea4f14eb22",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam1/57.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam1/59.mp4",
+      "bytes": 3411619,
+      "sha256": "7aa5aede8f462783a5a182d2315be7a1aaf8abba6629d6681f94096cdc14686c",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam1/59.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam1/6.mp4",
+      "bytes": 2439123,
+      "sha256": "b18e201dd9cd332a7439c964841eb81e8900a32dfd5b828af2cb3936ab21f745",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam1/6.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam1/61.mp4",
+      "bytes": 2525565,
+      "sha256": "166e3eda688c4b27a2cc7acc12ca8fa8311760bd7fca55c4b3dc02010a98926a",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam1/61.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam1/64.mp4",
+      "bytes": 3031353,
+      "sha256": "c61706d75451cc1f7093879e4f17fbf99990a24e68a20e2a3eb71e4d4382b189",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam1/64.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam1/66.mp4",
+      "bytes": 2629836,
+      "sha256": "8dde89cb23bf3c8552a1dcc43164bee1b794c9688fb899156a8e65193ae4b27b",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam1/66.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam1/68.mp4",
+      "bytes": 3918689,
+      "sha256": "4b6cf7b918a7c379bb230451625e60aed851cf643084f3ac1ad94f6998c6640c",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam1/68.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam1/69.mp4",
+      "bytes": 3776901,
+      "sha256": "b816c8c3f80a5795214559fa01f071d1038f806869c8a0943005a09355c6c2ce",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam1/69.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam1/70.mp4",
+      "bytes": 1674485,
+      "sha256": "863e1083156baba178d83f0b7f89a681d23f0a28a912754dcabcacc74b8a35f4",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam1/70.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam1/72.mp4",
+      "bytes": 3613166,
+      "sha256": "000cf1d2b4e34c70ce494f5179a2574aefc882f64f81366e90c86b5bf9ae4ba6",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam1/72.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam1/78.mp4",
+      "bytes": 2103390,
+      "sha256": "74c4b355de1ede08a8dce755ee1f0b4ac76110bef839024e8ab291135cf4cdcf",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam1/78.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam1/90.mp4",
+      "bytes": 2815953,
+      "sha256": "5beb92eb265d5ccd88ad2e81562fe5c26a86c4ee4b4e726c6c9711d5620af9ad",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam1/90.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam1/93.mp4",
+      "bytes": 1690082,
+      "sha256": "376146f85b2ca311b3d55561157e1b9ab0c59456c989c322f8a02e8b35a55133",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam1/93.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam1/94.mp4",
+      "bytes": 2365684,
+      "sha256": "bbe9e3c6deeb21d8b120cdfe31dd57f27cd3deba80f17ef7d7736f145da9adb1",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam1/94.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam2/108.mp4",
+      "bytes": 2995647,
+      "sha256": "adf2d204092bc84d12da79023d39199bef306bc7c2e2bca01646642941d86f2c",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam2/108.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam2/110.mp4",
+      "bytes": 2324728,
+      "sha256": "99f604306312581c3acb9c78098c2f58bc67ee67cde86c3122ec2285b1fc1193",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam2/110.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam2/114.mp4",
+      "bytes": 3179801,
+      "sha256": "c989c01a4bfda69244b550d602ee750fa396d1692f549c61779521223efea93a",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam2/114.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam2/14.mp4",
+      "bytes": 1738988,
+      "sha256": "d3b2202190ead1e89c14a594f2d03fe645a1f1bb7e5b74415c25bfff2c6d7935",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam2/14.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam2/16.mp4",
+      "bytes": 3497338,
+      "sha256": "1826fab39a4e5a3436b31853ed3e5622e0ee713a7d6f3ade4a8bc43e4328507e",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam2/16.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam2/17.mp4",
+      "bytes": 2057080,
+      "sha256": "acd844023fb325f8b5b3f21724e28536f0ac8a0e761a473c0371558a12be910c",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam2/17.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam2/18.mp4",
+      "bytes": 2950017,
+      "sha256": "9709a0f1b154ac1b8c1d0c0d4179083a7f6b9374e1d21a4bee7810e726c4d7e7",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam2/18.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam2/19.mp4",
+      "bytes": 2825600,
+      "sha256": "11cd116bbac1b681ccbaa4f8ab953033c3458797b397ab2a473c2a84f93da168",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam2/19.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam2/20.mp4",
+      "bytes": 1767318,
+      "sha256": "4a64496f3075b18deac9f48ceb15c8403d55c0176113756c72a98e5de9beb7c6",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam2/20.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam2/21.mp4",
+      "bytes": 2910109,
+      "sha256": "6f2f63be5766bdc52c36f0688ed5b76b0def05db4a981f896841c0a447d516ad",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam2/21.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam2/29.mp4",
+      "bytes": 2519969,
+      "sha256": "8833206a283c41e4c3ee1b552f16960f74a04c09b3db2bfa0973f189527e4342",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam2/29.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam2/4.mp4",
+      "bytes": 1559636,
+      "sha256": "efc8b3c004d4673013a568330047f8851635d6ec81ebcda0c804480913b0fa1d",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam2/4.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam2/5.mp4",
+      "bytes": 2180638,
+      "sha256": "2c76b1753253d2185c6e13f534a417b7f7e3976d2ab28c6b85e9b5ee73a2ed4f",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam2/5.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam2/51.mp4",
+      "bytes": 3339854,
+      "sha256": "f6e3a0ff8e15eebb18020aff9d3612ad7c9d0e6fb374f21fbfedffd51724919f",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam2/51.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam2/52.mp4",
+      "bytes": 1659771,
+      "sha256": "eea188332ad7867f95c8db4b434af65c0dcb85afaaa6a70181d2cdc930b05813",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam2/52.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam2/54.mp4",
+      "bytes": 6148647,
+      "sha256": "58281ba5f9bdb89582d0fabe6f3abf0c9110ce7c747e49b0079b8b3909d79e6b",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam2/54.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam2/57.mp4",
+      "bytes": 4262849,
+      "sha256": "d3981af404b53962f2029ebe09831fc822267b244a4fc6874a1658c51e51e737",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam2/57.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam2/59.mp4",
+      "bytes": 3870839,
+      "sha256": "70a333bb798bc2a8b6e63b88aa661afdf38e37c112a80afc6b1e5459df1b90ea",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam2/59.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam2/6.mp4",
+      "bytes": 2185638,
+      "sha256": "e27224ac4daa3d6cb9681902a45139cc0d561cee17eac9dec4add0794eab7eb5",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam2/6.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam2/61.mp4",
+      "bytes": 2769375,
+      "sha256": "860f63eea41dd0e2f1382ed5fd3d2117d357acba9140b2228206aa9515e4aad9",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam2/61.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam2/64.mp4",
+      "bytes": 2890861,
+      "sha256": "6a4fd6bb1eb5cf41c86bf6c0ce0eb6699e3346a2432fd8f39f6a2bfdb67525b2",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam2/64.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam2/66.mp4",
+      "bytes": 3129511,
+      "sha256": "3c0a4dff9d1f9dc9e55429ee57acc9ed42639bf2ed0a7de693e8901d75737d5c",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam2/66.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam2/68.mp4",
+      "bytes": 3689463,
+      "sha256": "0a7d7e433cab202153a7e437f5f85140d61da56ee6ac7f060313634d8e064f92",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam2/68.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam2/69.mp4",
+      "bytes": 4134710,
+      "sha256": "c587629dcc36c1b3912d53d648e692a9f28267d0bd88b463a417a0cf7c98e1e8",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam2/69.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam2/70.mp4",
+      "bytes": 1647912,
+      "sha256": "6cf2c55d3d907f08cb6c660b5ba70d535ebc61e3a6e6830370ae305196992116",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam2/70.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam2/72.mp4",
+      "bytes": 2949327,
+      "sha256": "9f1bfe73c16a941f7c8b5d3f82ae7e4eedb9109c60f84fe9b6ed296dc60d9b3c",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam2/72.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam2/78.mp4",
+      "bytes": 2541040,
+      "sha256": "91222203915692ef9a0aee2559de941e8593e90b2ec1fbef20f7566884cba78d",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam2/78.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam2/90.mp4",
+      "bytes": 3471382,
+      "sha256": "040d14171225087a4679d3789aef06064d0d77aff1ed12c7cdc198cd49886956",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam2/90.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam2/93.mp4",
+      "bytes": 1723654,
+      "sha256": "cf06885eb323c56442a34fe4bacdeebb5f888f5827c2abec561f33d90f6b9fa3",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam2/93.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/airtlab/violence-detection-dataset/violent/cam2/94.mp4",
+      "bytes": 2403329,
+      "sha256": "12754504c306def44e9c4a00c6f41896d847d4cb41de37b7aa1f72f69911c452",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/airtlab/violence-detection-dataset/violent/cam2/94.mp4",
+      "moved": true,
+      "reason": "excluded_by_current_fight_action_filter"
+    },
+    {
+      "path": "datasets/private/behave-fights/fight_margaret_1_24_01_2007.wmv",
+      "bytes": 97338699,
+      "sha256": "dbf7b088cd51f25e1796b74ce5886df10ee2f5ad5e28a1e4074e6de91a292476",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/behave-fights/fight_margaret_1_24_01_2007.wmv",
+      "moved": true,
+      "reason": "reserve_dataset_not_consumed_by_current_pipeline"
+    },
+    {
+      "path": "datasets/private/behave-fights/fight_margaret_2_24_01_2007.wmv",
+      "bytes": 28115799,
+      "sha256": "f8ceb510b746795da9e80eef9e65c9c2fc54657a11a9e64bf5694b6f87715102",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/behave-fights/fight_margaret_2_24_01_2007.wmv",
+      "moved": true,
+      "reason": "reserve_dataset_not_consumed_by_current_pipeline"
+    },
+    {
+      "path": "datasets/private/behave-fights/fight_taku_1_24_01_2007.wmv",
+      "bytes": 139903441,
+      "sha256": "f45fcb21a365f0e22d6a77c34cceb9b0cd43514aefdcbd3663f1776ee922dd25",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/behave-fights/fight_taku_1_24_01_2007.wmv",
+      "moved": true,
+      "reason": "reserve_dataset_not_consumed_by_current_pipeline"
+    },
+    {
+      "path": "datasets/private/behave-fights/fight_taku_2_24_01_2007.wmv",
+      "bytes": 49808613,
+      "sha256": "a0075619932aacf22f02a12771004aafd821f225f3c3a503b2c4a10c5f34839c",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/behave-fights/fight_taku_2_24_01_2007.wmv",
+      "moved": true,
+      "reason": "reserve_dataset_not_consumed_by_current_pipeline"
+    },
+    {
+      "path": "datasets/private/caviar-fights/Fight_Chase.mpg",
+      "bytes": 5087190,
+      "sha256": "f8cd06377f1b5e821cf6f397bf8caf0f8173e82f988947fe90a4e33c059f8f4f",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/caviar-fights/Fight_Chase.mpg",
+      "moved": true,
+      "reason": "reserve_dataset_not_consumed_by_current_pipeline"
+    },
+    {
+      "path": "datasets/private/caviar-fights/Fight_OneManDown.mpg",
+      "bytes": 11320119,
+      "sha256": "79e5bb85695611ce73246678d87710b582d79767894247118a79dc9790bf0147",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/caviar-fights/Fight_OneManDown.mpg",
+      "moved": true,
+      "reason": "reserve_dataset_not_consumed_by_current_pipeline"
+    },
+    {
+      "path": "datasets/private/caviar-fights/Fight_RunAway1.mpg",
+      "bytes": 6500613,
+      "sha256": "b1eb7821318a2443445ee0c6dd6edb4dd9ebe06c110b52dce9252b9117931a55",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/caviar-fights/Fight_RunAway1.mpg",
+      "moved": true,
+      "reason": "reserve_dataset_not_consumed_by_current_pipeline"
+    },
+    {
+      "path": "datasets/private/caviar-fights/Fight_RunAway2.mpg",
+      "bytes": 6483410,
+      "sha256": "a85016218359a2b9d771d2f2eabdbecf2d4c5e4b879b0a61bac43522c2aa0ce1",
+      "recovery_path": "/Users/wanwanzhu/.Trash/campus-safety-unused-videos-20260914-145853/datasets/private/caviar-fights/Fight_RunAway2.mpg",
+      "moved": true,
+      "reason": "reserve_dataset_not_consumed_by_current_pipeline"
+    }
+  ],
+  "removed_count": 68,
+  "removed_bytes": 516369120,
+  "physical_disk_freed_bytes": 0,
+  "protected_manifest_count": 590,
+  "training_manifest_rebuild_unchanged": true
+}

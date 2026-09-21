@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, replace
 from datetime import datetime, timedelta
 from typing import Any, Protocol
-from collections.abc import Iterable, Sequence
+from collections.abc import Iterable, Iterator, Sequence
 
 from campus_safety_ai.contracts import BehaviorObservation, EventRecord
 from campus_safety_ai.core.fight_analysis import FightEventAnalysis
@@ -60,6 +60,23 @@ class FightVideoPipeline:
     ) -> FightPipelineResult:
         observations: list[dict[str, Any]] = []
         events: list[EventRecord] = []
+        for batch in self.stream(source, camera_id, source_epoch, started_at):
+            observations.extend(batch.observations)
+            events.extend(batch.events)
+        return FightPipelineResult(tuple(observations), tuple(events), source.fps, source.sample_frequency)
+
+    def stream(
+        self,
+        source: VideoWindowSource,
+        camera_id: str,
+        source_epoch: int,
+        started_at: datetime,
+    ) -> Iterator[FightPipelineResult]:
+        """Yield each window immediately; retain only the current observation.
+
+        Normal EOF yields final lifecycle records. The caller owns source cleanup
+        when consumption stops early or a destination raises an exception.
+        """
         last_observation: BehaviorObservation | None = None
         for sequence, window in enumerate(source, start=1):
             prediction = self.classifier.predict(window.frames)
@@ -93,14 +110,11 @@ class FightVideoPipeline:
                 value["evidence"] = artifact
             if evidence_error is not None:
                 value["evidenceError"] = evidence_error
-            observations.append(value)
-            events.extend(self.analysis.advance(observation))
+            records = self.analysis.advance(observation)
             last_observation = observation
+            yield FightPipelineResult((value,), tuple(records), source.fps, source.sample_frequency)
 
         if last_observation is not None:
-            events.extend(
-                self.analysis.finalize(camera_id, source_epoch, last_observation.observed_at)
-            )
-        return FightPipelineResult(
-            tuple(observations), tuple(events), source.fps, source.sample_frequency
-        )
+            records = self.analysis.finalize(camera_id, source_epoch, last_observation.observed_at)
+            if records:
+                yield FightPipelineResult((), tuple(records), source.fps, source.sample_frequency)

@@ -4,6 +4,7 @@ import unittest
 from dataclasses import replace
 from datetime import UTC, datetime
 from pathlib import Path
+from uuid import UUID
 
 from campus_safety_ai.adapters.easyaiot import (
     EasyAIoTDeliveryError,
@@ -49,7 +50,13 @@ class EasyAIoTAdapterTests(unittest.TestCase):
         self.assertEqual(payload["time"], "2026-08-25 16:00:05")
         self.assertEqual(payload["image_path"], "runtime/evidence/snapshot.jpg")
         self.assertEqual(payload["record_path"], "runtime/evidence/clip.mp4")
-        self.assertEqual(payload["correlation_id"], "evt-1:2")
+        self.assertEqual(len(payload["correlation_id"]), 36)
+        UUID(payload["correlation_id"])
+        self.assertEqual(
+            payload["correlation_id"],
+            EasyAIoTEventMapper().to_payload(self.record("START"))["correlation_id"],
+        )
+        self.assertEqual(payload["information"]["idempotencyKey"], "evt-1:2")
         self.assertEqual(payload["information"]["phase"], "END")
         self.assertEqual(payload["information"]["eventRecord"]["eventId"], "evt-1")
 

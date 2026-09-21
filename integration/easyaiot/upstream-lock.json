@@ -1,0 +1,12 @@
+{
+  "repository": "https://gitee.com/ptgosn/easyaiot.git",
+  "branch": "main",
+  "commit": "49f00960a2907c0066b2c3f6e36c8cb9c9239320",
+  "retrieved_on": "2026-09-14",
+  "checkout": "/Users/wanwanzhu/easyaiot-integration-20260914",
+  "license_file": "LICENSE",
+  "clone_depth": 1,
+  "upstream_modified": false,
+  "handler_contract_verified": true,
+  "full_platform_verified": false
+}

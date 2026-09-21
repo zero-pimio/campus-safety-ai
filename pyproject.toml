@@ -41,6 +41,7 @@ line-length = 110
 select = ["E4", "E7", "E9", "F", "B", "UP"]
 
 [project.scripts]
+campus-safety-deliver-events = "campus_safety_ai.apps.deliver_events:main"
 campus-safety-replay = "campus_safety_ai.apps.offline_replay:main"
 campus-safety-demo = "campus_safety_ai.apps.fake_chain:main"
 campus-safety-fight-replay = "campus_safety_ai.apps.fight_replay:main"

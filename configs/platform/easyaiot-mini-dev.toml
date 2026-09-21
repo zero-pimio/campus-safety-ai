@@ -1,0 +1,14 @@
+schema_version = "1.0"
+destination = "easyaiot"
+outbox = "runtime/easyaiot-mini/outbox.sqlite3"
+# CLI compatibility path; remote delivery does not create a local event JSONL.
+events = "runtime/easyaiot-mini/events.jsonl"
+
+[easyaiot]
+# Pinned upstream VIDEO direct route; use only with your local mini deployment.
+endpoint = "http://127.0.0.1:6000/video/alert/hook"
+token_env = "EASYAIOT_TOKEN"
+timeout_seconds = 10
+device_name = ""
+object = "person"
+task_type = "realtime"

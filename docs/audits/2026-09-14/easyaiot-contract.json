@@ -1,0 +1,23 @@
+{
+  "upstream_commit": "49f00960a2907c0066b2c3f6e36c8cb9c9239320",
+  "cases": [
+    {
+      "upstream_status": "success",
+      "accepted": true
+    },
+    {
+      "upstream_status": "skipped",
+      "accepted": false
+    },
+    {
+      "upstream_status": "suppressed",
+      "accepted": false
+    },
+    {
+      "upstream_status": "failed",
+      "accepted": false
+    }
+  ],
+  "scope": "real upstream handler functions over local HTTP; downstream service substituted",
+  "full_platform_verified": false
+}

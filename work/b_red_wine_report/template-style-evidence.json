@@ -1,0 +1,151 @@
+{
+  "input": "/Users/wanwanzhu/Library/Containers/com.tencent.xinWeChat/Data/Documents/xwechat_files/wxid_1q0qcco4cyfj22_d6f3/msg/file/2026-09/\u673a\u5668\u5b66\u4e60\u5927\u4f5c\u4e1a\u6a21\u677f.docx",
+  "fonts_by_char_count": {
+    "\u5b8b\u4f53": 408,
+    "\u9ed1\u4f53": 404
+  },
+  "direct_run_formatting_runs": 131,
+  "direct_paragraph_formatting_paragraphs": 89,
+  "heading_like_paragraphs_not_heading_style": [
+    {
+      "para_index": 5,
+      "text": " \u6a21\u5f0f\u8bc6\u522b\u8bfe\u7a0b\u8bbe\u8ba1\u62a5\u544a",
+      "style": "Normal"
+    },
+    {
+      "para_index": 15,
+      "text": "\u5e74     \u6708     \u65e5",
+      "style": "Plain Text"
+    },
+    {
+      "para_index": 29,
+      "text": "\uff08\u76ee\u5f55\u683c\u5f0f\uff09             \u76ee    \u5f55",
+      "style": "Normal"
+    },
+    {
+      "para_index": 71,
+      "text": "\uff08\u4e2d\u82f1\u6587\u6458\u8981\u53ca\u5173\u952e\u8bcd\u683c\u5f0f\uff09        \u6458  \u8981",
+      "style": "Normal"
+    },
+    {
+      "para_index": 81,
+      "text": "\u5173\u952e\u8bcd\uff1a(\u5c0f\u56db\u53f7\u3001\u9ed1\u4f53\u3001\u52a0\u9ed1\u3001\u9876\u683c) ",
+      "style": "Normal"
+    },
+    {
+      "para_index": 95,
+      "text": "Key words\uff1a(\u5c0f\u56db\u53f7\u3001Times New Roman\u3001\u9ed1\u4f53\u3001\u52a0\u9ed1\u3001\u9876\u683c) ",
+      "style": "Normal"
+    },
+    {
+      "para_index": 104,
+      "text": "\uff08\u6b63\u6587\u683c\u5f0f\uff09        \u7b2c\u4e00\u7ae0\uff08\u7a7a\u4e24\u683c\uff09\u2606\u2606\u2606\u2606\u2606",
+      "style": "Normal"
+    },
+    {
+      "para_index": 117,
+      "text": "\u7b2c\u4e8c\u7ae0  \u2606\u2606\u2606\u2606\u2606",
+      "style": "Normal"
+    },
+    {
+      "para_index": 125,
+      "text": "\u53c2\u8003\u6587\u732e\uff08\u56db\u53f7\u3001\u9ed1\u4f53\u3001\u52a0\u9ed1\u3001\u9876\u683c\uff09",
+      "style": "Normal"
+    },
+    {
+      "para_index": 140,
+      "text": "\u9898    \u76ee",
+      "style": "Normal"
+    },
+    {
+      "para_index": 142,
+      "text": "\u5b66    \u9662",
+      "style": "Normal"
+    },
+    {
+      "para_index": 144,
+      "text": "\u4e13    \u4e1a",
+      "style": "Normal"
+    },
+    {
+      "para_index": 146,
+      "text": "\u59d3    \u540d",
+      "style": "Normal"
+    },
+    {
+      "para_index": 148,
+      "text": "\u5b66    \u53f7",
+      "style": "Normal"
+    },
+    {
+      "para_index": 150,
+      "text": "\u4efb\u8bfe\u6559\u5e08",
+      "style": "Normal"
+    },
+    {
+      "para_index": 152,
+      "text": "\u6210   \u7ee9",
+      "style": "Normal"
+    }
+  ],
+  "examples": {
+    "direct_run_formatting": [
+      {
+        "para_index": 5,
+        "run_text": " ",
+        "style": "Normal"
+      },
+      {
+        "para_index": 5,
+        "run_text": "\u6a21\u5f0f\u8bc6\u522b",
+        "style": "Normal"
+      },
+      {
+        "para_index": 5,
+        "run_text": "\u8bfe\u7a0b",
+        "style": "Normal"
+      },
+      {
+        "para_index": 5,
+        "run_text": "\u8bbe\u8ba1",
+        "style": "Normal"
+      },
+      {
+        "para_index": 5,
+        "run_text": "\u62a5\u544a",
+        "style": "Normal"
+      }
+    ],
+    "direct_paragraph_formatting": [
+      {
+        "para_index": 10,
+        "text": "",
+        "style": "Plain Text"
+      },
+      {
+        "para_index": 11,
+        "text": "",
+        "style": "Plain Text"
+      },
+      {
+        "para_index": 12,
+        "text": "",
+        "style": "Plain Text"
+      },
+      {
+        "para_index": 13,
+        "text": "",
+        "style": "Plain Text"
+      },
+      {
+        "para_index": 29,
+        "text": "\uff08\u76ee\u5f55\u683c\u5f0f\uff09             \u76ee    \u5f55",
+        "style": "Normal"
+      }
+    ]
+  },
+  "notes": [
+    "Direct formatting is not always wrong, but it often causes inconsistent output when templates change.",
+    "Heading-like paragraphs not using Heading styles can break TOC and accessibility."
+  ]
+}

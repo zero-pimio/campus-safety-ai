@@ -25,6 +25,12 @@ FramePacket → Detections → Tracks → EventRecord → SQLite Outbox → Dest
 
 当前边界：本地 MP4、三种 PC 模型运行时、ByteTrack adapter 和本地证据已跑通；RTSP adapter 已实现但尚未用真实摄像头长稳验收。OpenRemote/MQTT、RKNN/昇腾板卡、校园数据精度和证据保留策略仍未验证。这些属于后续门禁，不能把本骨架当成已部署系统。
 
+## 本轮整改（2026-09-14）
+
+详细任务、优先级、架构、平台整合步骤和验收矩阵见 [整改方案](docs/REMEDIATION-PLAN-2026-09-14.md)，视频逐文件处理记录见 [清理清单](docs/audits/2026-09-14/video-cleanup.json)。
+
+打架视频 CLI 现在逐窗口写观测、提交事件，不再等视频结束后统一交付，也不保留完整结果列表。Python 离线调用仍可使用 `FightVideoPipeline.run()` 汇总有限视频；持续源使用 `stream()`。正常 EOF 会产生必要的 END 记录。EasyAIoT 视频入口已使用独立后台交付：分析先本地入队，网络失败自动退避重试，重启可补传。RTSP 自动重连仍待实施，详见方案。
+
 ## 立即运行
 
 项目本身只需要 Python 3.11+：
@@ -142,7 +148,7 @@ PYTHONPATH=src .venv/bin/python -m campus_safety_ai.apps.fight_video \
   --platform-config configs/platform/easyaiot-dev.toml
 ```
 
-适配器 POST 到 EasyAIoT 的 `/admin-api/video/alert/hook`，发送 `device_id`、`event`、`information`、`image_path`、`record_path`、`task_type` 和 `correlation_id`。`information.eventRecord` 保留完整的 `START/UPDATE/END` 事件；EasyAIoT 不可用时，Outbox 行保持未投递，下一次 flush 可重试。当前仅完成协议适配，真实 EasyAIoT 服务、摄像头长稳、MinIO 路径共享和通知闭环仍需现场验收。
+适配器 POST 到 EasyAIoT 的 `/admin-api/video/alert/hook`，发送 `device_id`、`event`、`information`、`image_path`、`record_path`、`task_type` 和 `correlation_id`。`information.eventRecord` 保留完整的 `START/UPDATE/END` 事件；EasyAIoT 不可用时，Outbox 行保持未投递，下一次 flush 可重试。已按检出上游校验 `code=0` 与 `data.status=success`，跳过/抑制不标记交付成功；correlation_id 使用同事件稳定的 36 字符 UUID，它不代表接收端去重。源码版本、契约验证、mini 配置和真实联调步骤见 [EasyAIoT 整合记录](integration/easyaiot/README.md)。真实 EasyAIoT 服务、摄像头长稳、MinIO 路径共享和通知闭环仍需现场验收。
 
 项目总体范围、深模块设计、数据与测试体系、16 周执行计划、风险和当前真实状态见 [总项目规划](docs/PROJECT-PLAN.md)；统一领域术语见 [CONTEXT.md](CONTEXT.md)。
 
@@ -162,3 +168,28 @@ docs/                   # 规格、ADR、路线和研究记录
 deployment/             # PC/RKNN/Ascend/OpenRemote 占位说明
 datasets/               # 只提交 manifest，不提交隐私视频
 ```
+
+
+## 交付队列状态与恢复补传
+
+EasyAIoT 视频 CLI 自动启用后台发送。SQLite 连接分别由分析线程和交付线程创建、使用和关闭；网络等待不会占用视频消费线程。本地 JSONL 与已有离线调用保持同步语义，Python 调用可用 `background_delivery=True` 启用后台发送。
+
+查看队列（只读，不发送、不升级数据库）：
+
+```bash
+.venv/bin/python -m campus_safety_ai.apps.deliver_events \
+  --platform-config configs/platform/easyaiot-mini-dev.toml --status
+```
+
+平台恢复后独立补传（不重新执行视频推理）：
+
+```bash
+.venv/bin/python -m campus_safety_ai.apps.deliver_events \
+  --platform-config configs/platform/easyaiot-mini-dev.toml
+```
+
+用 `--outbox` 指定其他队列；`--retry-base`、`--retry-max` 设置补传退避秒数。默认 1 秒起步、指数递增、上限 60 秒；按整条队列 FIFO 发送，失败队首不会被后续 END 越过，也会暂时阻塞其他事件。失败只保存异常类型，避免将凭据写入错误字段。
+
+旧数据库增加 attempts/next_attempt_at/last_error 前，若已有事件会生成邻接的 `.backup-<id>.sqlite3` 备份；旧事件和 delivered 状态保留。退出最多等待约 3 秒，未完成事件继续保留；正在进行的 HTTP 请求可能到其超时才结束，日志会明确提示。
+
+同一 outbox 在本机只允许一个后台发送器（macOS/Linux 文件锁）。补传前停止占用该队列的分析进程，或等待其退出。不要同时运行绕过该锁的旧同步 flush。语义仍是至少一次：接收端事务去重、按事件生命周期合并、永久错误人工处理和积压容量治理尚未实现。

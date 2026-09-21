@@ -1,7 +1,9 @@
+import sqlite3
 import tempfile
 import unittest
 from datetime import datetime, UTC
 from pathlib import Path
+from unittest.mock import patch
 
 from campus_safety_ai.contracts import EventRecord
 from campus_safety_ai.core.event_delivery import EventDelivery, InMemoryDestination
@@ -41,6 +43,15 @@ class DeliveryTests(unittest.TestCase):
                 self.assertEqual(target.records[0]["evidenceUris"], [])
             finally:
                 delivery.close()
+
+    def test_context_closes_database_when_final_flush_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            delivery = EventDelivery(Path(directory) / "outbox.sqlite3", InMemoryDestination())
+            with patch.object(delivery, "flush", side_effect=RuntimeError("offline")):
+                with self.assertRaisesRegex(RuntimeError, "offline"), delivery:
+                    pass
+            with self.assertRaises(sqlite3.ProgrammingError):
+                delivery.connection.execute("SELECT 1")
 
 
 if __name__ == "__main__":

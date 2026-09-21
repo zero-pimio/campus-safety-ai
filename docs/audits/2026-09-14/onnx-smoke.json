@@ -1,0 +1,13 @@
+{
+  "model": "runtime/training/fight-tsn-v1/fight-tsn.onnx",
+  "input": "runtime/smoke/composite/fight-then-normal.mp4",
+  "windows": 4,
+  "phases": [
+    "START",
+    "END"
+  ],
+  "same_event_id": true,
+  "pending": 0,
+  "integrity": "ok",
+  "destination": "local JSONL; not EasyAIoT"
+}

@@ -18,6 +18,7 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 from zoneinfo import ZoneInfo
+from uuid import NAMESPACE_URL, uuid5
 
 from campus_safety_ai.contracts import EventRecord, iso_time
 from campus_safety_ai.core.event_delivery import Destination, JsonlDestination
@@ -139,9 +140,10 @@ class EasyAIoTEventMapper:
             "image_path": image_path,
             "record_path": record_path,
             "task_type": self.task_type,
-            # EasyAIoT calls this correlation_id.  The per-revision value
-            # preserves the project's idempotency semantics on its side.
-            "correlation_id": record.idempotency_key,
+            # Upstream stores a 36-character association ID, not a dedup key.
+            # All revisions of one event share it; the full idempotency key
+            # stays in information and the request header.
+            "correlation_id": str(uuid5(NAMESPACE_URL, f"campus-safety-ai:{record.event_id}")),
         }
 
 
@@ -154,7 +156,27 @@ def _post_json(
     request = Request(endpoint, data=body, headers=dict(headers), method="POST")
     try:
         with urlopen(request, timeout=timeout_seconds) as response:
-            response.read()
+            # The pinned upstream uses HTTP 200 even for business failures,
+            # skipped tasks and suppressed events. Only an explicit acceptance
+            # may mark the durable outbox record delivered.
+            raw = response.read(1_048_577)
+            if len(raw) > 1_048_576:
+                raise EasyAIoTDeliveryError("EasyAIoT response exceeds 1 MiB")
+            try:
+                payload = json.loads(raw)
+            except (ValueError, UnicodeDecodeError) as exc:
+                raise EasyAIoTDeliveryError("EasyAIoT returned an invalid JSON response") from exc
+            if not isinstance(payload, dict) or type(payload.get("code")) is not int:
+                raise EasyAIoTDeliveryError("EasyAIoT response is missing a business code")
+            if payload["code"] != 0:
+                raise EasyAIoTDeliveryError(f"EasyAIoT business failure code={payload['code']}")
+            result = payload.get("data")
+            if not isinstance(result, dict) or result.get("status") != "success":
+                # Do not echo arbitrary response content or secrets into logs.
+                status = result.get("status") if isinstance(result, dict) else None
+                if isinstance(status, str) and status in {"skipped", "suppressed", "failed"}:
+                    raise EasyAIoTDeliveryError(f"EasyAIoT did not accept the event ({status})")
+                raise EasyAIoTDeliveryError("EasyAIoT response does not confirm event acceptance")
             return int(response.status)
     except HTTPError as exc:
         raise EasyAIoTDeliveryError(f"EasyAIoT endpoint returned HTTP {exc.code}") from exc

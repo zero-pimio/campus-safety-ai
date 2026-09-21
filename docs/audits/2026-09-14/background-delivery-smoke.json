@@ -1,0 +1,24 @@
+{
+  "scope": "real ONNX and real local HTTP; simulated EasyAIoT outage, not production platform",
+  "attempts": [
+    "START",
+    "START",
+    "END"
+  ],
+  "accepted": [
+    "START",
+    "END"
+  ],
+  "database_rows": [
+    [
+      1,
+      2
+    ],
+    [
+      1,
+      1
+    ]
+  ],
+  "output": "/Users/wanwanzhu/yolo/runtime/async-delivery-630gscdu",
+  "passed": true
+}

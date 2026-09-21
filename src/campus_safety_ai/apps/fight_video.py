@@ -5,6 +5,7 @@ import json
 from datetime import datetime, UTC
 from pathlib import Path
 from typing import Any
+from collections.abc import Callable
 from urllib.parse import urlparse
 
 from campus_safety_ai.adapters.easyaiot import build_platform_destination
@@ -14,6 +15,7 @@ from campus_safety_ai.adapters.runtimes.paddle_fight import PaddlePpTsmFightClas
 from campus_safety_ai.adapters.video_sources import OpenCvVideoSource, redact_video_source
 from campus_safety_ai.apps.fight_replay import default_fight_analysis
 from campus_safety_ai.contracts import iso_time, parse_time
+from campus_safety_ai.core.background_delivery import BackgroundDelivery
 from campus_safety_ai.core.event_delivery import Destination, EventDelivery, JsonlDestination
 from campus_safety_ai.core.fight_analysis import FightEventAnalysis
 from campus_safety_ai.core.fight_inference import FightClassifier
@@ -37,6 +39,7 @@ def _execute(
     sample_frequency: int = 7,
     analysis: FightEventAnalysis | None = None,
     evidence: EvidenceSink | None = None,
+    consume: Callable[[FightPipelineResult], None] | None = None,
 ) -> FightPipelineResult:
     requested_frame_len = frame_len or classifier.frame_len
     if requested_frame_len != classifier.frame_len:
@@ -50,7 +53,12 @@ def _execute(
         analysis or default_fight_analysis(),
         evidence or NullEvidenceSink(),
     )
-    return pipeline.run(source, camera_id, source_epoch, started_at)
+    with source:
+        if consume is None:
+            return pipeline.run(source, camera_id, source_epoch, started_at)
+        for batch in pipeline.stream(source, camera_id, source_epoch, started_at):
+            consume(batch)
+        return FightPipelineResult((), (), source.fps, source.sample_frequency)
 
 
 def analyze_video(
@@ -66,13 +74,6 @@ def analyze_video(
         result.fps,
         result.sample_frequency,
     )
-
-
-def _write_jsonl(path: Path, records: list[dict[str, Any]]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", encoding="utf-8") as handle:
-        for record in records:
-            handle.write(json.dumps(record, ensure_ascii=False, separators=(",", ":")) + "\n")
 
 
 def _source_stem(source: str | Path, camera_id: str) -> str:
@@ -98,42 +99,47 @@ def run(
     events_path: Path | None = None,
     outbox_path: Path | None = None,
     destination: Destination | None = None,
+    collect_results: bool = True,
+    background_delivery: bool = False,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     classifier = classifier or PaddlePpTsmFightClassifier(model_dir)
-    result = _execute(
-        video_path,
-        classifier,
-        camera_id,
-        started_at,
-        source_epoch,
-        frame_len,
-        sample_frequency,
-        analysis,
-        evidence,
-    )
-    observations = list(result.observations)
-    events = [record.to_dict() for record in result.events]
     stem = _source_stem(video_path, camera_id)
     observations_path = output_dir / f"{stem}-observations.jsonl"
+    observations_path.parent.mkdir(parents=True, exist_ok=True)
     events_path = events_path or output_dir / f"{stem}-events.jsonl"
     outbox_path = outbox_path or events_path.with_suffix(".sqlite3")
-    _write_jsonl(observations_path, observations)
-    with EventDelivery(
+    observations: list[dict[str, Any]] = []
+    events: list[dict[str, Any]] = []
+    window_count = 0
+    event_count = 0
+    delivery_type = BackgroundDelivery if background_delivery else EventDelivery
+    with delivery_type(
         outbox_path,
         destination or JsonlDestination(events_path),
-    ) as delivery:
-        delivery.submit(list(result.events))
+    ) as delivery, observations_path.open("w", encoding="utf-8") as handle:
+        def consume(batch: FightPipelineResult) -> None:
+            nonlocal window_count, event_count
+            delivery.submit(list(batch.events))
+            for item in batch.observations:
+                handle.write(json.dumps(item, ensure_ascii=False, separators=(",", ":")) + "\n")
+                start, end = item["sampledFrameRange"]
+                print(f"window={item['sequence']} frames={start}-{end} fight_score={item['score']:.6f}")
+            handle.flush()
+            window_count += len(batch.observations)
+            event_count += len(batch.events)
+            if collect_results:
+                observations.extend(batch.observations)
+                events.extend(record.to_dict() for record in batch.events)
 
-    for item in observations:
-        start, end = item["sampledFrameRange"]
-        print(
-            f"window={item['sequence']} frames={start}-{end} "
-            f"fight_score={item['score']:.6f}"
+        result = _execute(
+            video_path, classifier, camera_id, started_at, source_epoch,
+            frame_len, sample_frequency, analysis, evidence, consume,
         )
+
     print(
         f"video={redact_video_source(video_path)} fps={result.fps:.3f} "
         f"sample_frequency={result.sample_frequency} "
-        f"windows={len(observations)} events={len(events)}"
+        f"windows={window_count} events={event_count}"
     )
     print(f"observations -> {observations_path}")
     print(f"events -> {events_path}")
@@ -207,6 +213,8 @@ def main() -> None:
         events_path=events_path,
         outbox_path=outbox_path,
         destination=destination,
+        collect_results=False,
+        background_delivery=platform.destination == "easyaiot",
     )
 
 

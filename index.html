@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="校园安全 AI 研究演示：观看真实连续视频中的跌倒与日常走路识别，支持原速播放、全屏和 MP4 下载。">
+  <meta name="theme-color" content="#142823">
+  <title>校园安全 AI · 跌倒识别演示</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#player">跳到视频</a>
+  <header class="site-header wrap">
+    <a class="brand" href="./" aria-label="校园安全 AI 演示首页"><span class="brand-icon" aria-hidden="true">⌁</span>校园安全 AI<span class="brand-divider">/</span><span class="brand-note">研究演示</span></a>
+    <a class="header-link" href="#downloads">下载视频 <span aria-hidden="true">↗</span></a>
+  </header>
+  <main class="wrap">
+    <section class="hero" aria-labelledby="title">
+      <div>
+        <p class="eyebrow"><span></span>动作识别 · 实际模型输出</p>
+        <h1 id="title">看见动作，<br>也看见模型的判断。</h1>
+        <p class="hero-description">两段真实连续录像，展示跌倒与日常走路的识别过程。框的颜色和分数随实际预测变化，保留判断中的波动。</p>
+      </div>
+      <div class="hero-note"><span class="note-number">02</span><span>段公开数据验证素材</span><span class="note-rule"></span><span>原速播放 · 完整连续帧<br>研究候选模型 · 非现场监控</span></div>
+    </section>
+    <section class="viewer" aria-label="视频展示">
+      <div class="player-area">
+        <div class="player-heading"><h2 id="clip-title">跌倒动作识别</h2><span id="clip-meta">3.3 秒 · 100 帧</span></div>
+        <video id="player" controls playsinline preload="metadata" poster="assets/fall-poster.jpg" aria-label="跌倒动作识别视频，无音频，画面包含中文识别状态与分数">
+          <source src="assets/fall-detection.mp4" type="video/mp4">
+          浏览器无法播放视频，请使用下方 MP4 下载链接。
+        </video>
+        <p id="player-error" class="player-error" hidden>视频暂时无法加载。请稍后重试，或通过下方链接下载 MP4。</p>
+        <div class="player-caption"><span class="caption-mark" aria-hidden="true"></span><p id="clip-description" aria-live="polite">动作开始阶段有短暂判断抖动；素材时间 0.934 秒后持续判为跌倒动作。该时间不是报警延迟。</p></div>
+      </div>
+      <div class="playlist" role="group" aria-label="选择视频">
+        <span class="playlist-label">选择片段</span>
+        <button class="clip-button selected" type="button" data-clip="fall" aria-pressed="true" aria-controls="player">
+          <img src="assets/fall-poster.jpg" alt="人物跌倒时的红色识别框" width="1280" height="800">
+          <span class="clip-text"><span class="clip-index">01 / 跌倒</span><strong>跌倒动作识别</strong><span>3.3 秒 · 原速 · 无音频</span></span><span class="clip-arrow" aria-hidden="true">↗</span>
+        </button>
+        <button class="clip-button" type="button" data-clip="walk" aria-pressed="false" aria-controls="player">
+          <img src="assets/walking-poster.jpg" alt="日常走路人物的绿色识别框" width="1280" height="800">
+          <span class="clip-text"><span class="clip-index">02 / 日常活动</span><strong>正常走路识别</strong><span>10 秒 · 原速 · 无音频</span></span><span class="clip-arrow" aria-hidden="true">↗</span>
+        </button>
+        <div class="legend"><h3>读懂画面</h3><p><i class="dot red"></i>红色：检测到跌倒动作</p><p><i class="dot green"></i>绿色：未见跌倒动作</p><p><i class="dot amber"></i>黄色：预热或无法判断</p><small>“未见跌倒动作”不等于人员安全。</small></div>
+      </div>
+    </section>
+    <section class="bottom-grid" id="downloads">
+      <div class="download-panel"><p class="eyebrow">保存与分享</p><h2>把演示带走。</h2><p>下载 MP4，或直接转发当前网页链接。</p><div class="download-links"><a href="assets/fall-detection.mp4" download="跌倒识别演示.mp4">跌倒识别 <span>MP4 · 2.1 MB ↓</span></a><a href="assets/walking.mp4" download="正常走路识别演示.mp4">正常走路 <span>MP4 · 10.3 MB ↓</span></a></div><button id="share-button" class="share-button" type="button">复制网页链接 <span aria-hidden="true">↗</span></button><p id="share-status" role="status" class="share-status"></p></div>
+      <div class="context-panel"><p class="eyebrow">如何理解结果</p><h2>展示进步，也保留边界。</h2><p>这段走路录像的 285 个可判断时点中，新版没有跌倒误报。跌倒录像仍存在早期分数波动。</p><p>两段素材已用于开发验证，不能代表独立测试准确率、校园泛化效果或正式告警性能。本页展示预先计算的识别回放，不提供实时检测。</p><a href="media.json">查看视频校验信息 <span aria-hidden="true">↗</span></a></div>
+    </section>
+  </main>
+  <footer class="wrap footer">
+    <div class="footer-top"><strong>校园安全 AI · 非商用学术演示</strong><span>更新于 2026.09.21</span></div>
+    <p>素材来源：<a href="https://fenix.ur.edu.pl/mkepski/ds/uf.html">UR Fall Detection Dataset</a>，University of Rzeszów / Michał Kępski。使用序列 fall-06、adl-10 的 cam0 RGB 原始帧；本项目添加人体姿态、模型分数与中文界面，并编码为 MP4。原始素材及本演示视频、封面图按 <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 分享。</p>
+    <p>引用：Bogdan Kwolek, Michal Kepski. <cite>Human fall detection on embedded platform using depth maps and wireless accelerometer.</cite> Computer Methods and Programs in Biomedicine 117(3), 2014, 489–501。原作者不为本项目的模型或效果背书。</p>
+  </footer>
+</body>
+</html>

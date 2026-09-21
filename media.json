@@ -1,0 +1,19 @@
+{
+  "model_checkpoint_sha256": "3ae4b6237f16f6c377f118fc1c0b69e9d069765e8d61f13b351e5403d1f1b368",
+  "videos": {
+    "fall-detection.mp4": {
+      "sha256": "2c0e9041a7b60109bf579113139f0e57c9904eef202bf67b54a4869d4578766d",
+      "sequence": "fall-06",
+      "frames": 100,
+      "duration_seconds": 3.304
+    },
+    "walking.mp4": {
+      "sha256": "2b85870e7313575bda929fdd949f044b0719dd8701c07457974c27e4dd458e68",
+      "sequence": "adl-10",
+      "frames": 300,
+      "duration_seconds": 9.969
+    }
+  },
+  "license": "CC BY-NC-SA 4.0",
+  "dataset_source": "https://fenix.ur.edu.pl/mkepski/ds/uf.html"
+}

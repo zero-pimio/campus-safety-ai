@@ -1,5 +1,23 @@
 # 校园安全 AI（YOLO）项目
 
+## 视频演示
+
+下方动图直接展示新版模型在真实连续录像中的识别结果；点击动图可打开完整 MP4，也可以进入 [视频展示页](https://zero-pimio.github.io/campus-safety-ai/) 全屏观看和下载。
+
+**跌倒动作识别 · 3.3 秒**
+
+[![跌倒识别动图：人体框和模型分数随实际预测变化](docs/media/fall-preview.gif)](https://zero-pimio.github.io/campus-safety-ai/assets/fall-detection.mp4)
+
+**日常走路 · 10 秒**
+
+[![日常走路识别动图：本片段未出现跌倒误报](docs/media/walking-preview.gif)](https://zero-pimio.github.io/campus-safety-ai/assets/walking.mp4)
+
+红色表示检测到跌倒动作，绿色表示未见跌倒动作，黄色表示预热或无法判断。动图经过缩小和降帧率处理，完整 MP4 保留原始连续帧与播放时间。两段均为开发验证素材；跌倒开始阶段仍有判断抖动，不代表已通过真实校园验收。
+
+素材来自 [UR Fall Detection Dataset](https://fenix.ur.edu.pl/mkepski/ds/uf.html)（University of Rzeszów / Michał Kępski），使用 fall-06、adl-10 的 cam0 RGB 序列。本项目添加了姿态、分数和中文说明；视频及动图沿用 [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)，用于非商用学术演示。引用：Bogdan Kwolek、Michal Kepski，*Human fall detection on embedded platform using depth maps and wireless accelerometer*，2014，117(3)，489–501。原作者不为本项目效果背书。
+
+## 项目说明
+
 这是根据“视觉识别 YOLO 课题”对话创建的防返工工程骨架。首版范围不是同时实现七种行为，而是先稳定下面这条链路：
 
 ```text

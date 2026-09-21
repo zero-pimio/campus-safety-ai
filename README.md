@@ -151,6 +151,26 @@ PYTHONPATH=src .venv/bin/python -m campus_safety_ai.apps.offline_replay \
 
 低内存微调可使用 `--batch-size 2 --accumulation-steps 4 --freeze-batch-norm`：累积梯度后更新，固定 BatchNorm 运行统计，名义有效批量为 8。视频采样采用有界顺序解码，较大跳距仍使用 seek。实际对照训练、验证/测试指标和后续验收边界见 [2026-09-21 训练优化报告](docs/training/optimization-2026-09-21.md)。
 
+## 跌倒识别训练进展
+
+已训练仅使用人体运动特征的分类头，并补齐 8 段训练视频的 1302 张连续原帧。同一段走路验证录像的误报时点从 80/285 降为 0/285；跌倒验证片段仍可识别，但早期分数有抖动。整段复用 test 为 14/14 正确，不能作为新的独立实时验收证据。
+
+权重、完整失败对照、连续识别结果与复现命令见 [姿态运动训练报告](docs/training/fall-pose-motion-2026-09-21.md)。目前为研究候选模型，尚未接入常驻告警，也未验证校园泛化。
+
+## 跌倒分类训练（URFD 历史 RGB 基线）
+
+独立训练流程使用 URFD 的 cam0 RGB 序列，按序列固定划分为 42 段训练、14 段验证、14 段测试。每段从有官方同步记录的 RGB 帧中等分采样 16 帧；冻结 ImageNet MobileNetV3-Small，训练时间特征分类层。两组参数与阈值仅通过验证集选择，权重重载和 ONNX 对齐通过后才评估测试集。
+
+```bash
+.venv/bin/python scripts/prepare_urfd.py
+.venv/bin/python scripts/train_urfd_baseline.py \
+  --device mps --output runtime/training/fall-urfd-new
+```
+
+没有 MPS 的机器可用 `--device cpu`。准备脚本可校验缓存后恢复下载；训练输出目录须为空。产物包括独立的 `best.pt`、`model.onnx`、两组训练历史、冻结选择记录及逐序列测试结果。原打架权重保持原样。数据来源为 [UR Fall Detection Dataset](https://fenix.ur.edu.pl/mkepski/ds/uf.html)，采用 CC BY-NC-SA 4.0 许可。
+
+该模型使用完整序列的稀疏帧，仅验证离线跌倒分类，不提供实时报警、跌倒人物定位或校园场景验收结论。实际成绩、数据缺帧处理和可播放回放见 [URFD 训练报告](docs/training/fall-urfd-v1-2026-09-21.md)。
+
 ## 安装真实 YOLO 能力
 
 ```bash

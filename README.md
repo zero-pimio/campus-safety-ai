@@ -36,7 +36,7 @@ FramePacket → Detections → Tracks → EventRecord → SQLite Outbox → Dest
 项目本身只需要 Python 3.11+：
 
 ```bash
-python3 -m unittest discover -s tests -v
+PYTHONPATH=src python3 -m unittest discover -s tests -v
 PYTHONPATH=src python3 -m campus_safety_ai.apps.fake_chain
 PYTHONPATH=src python3 -m campus_safety_ai.apps.offline_replay \
   --input tests/golden/intrusion/detections.jsonl \
@@ -100,23 +100,29 @@ brew install python@3.11
 .venv/bin/campus-safety-train-fight \
   --project-root . \
   --manifest datasets/manifests/fight-v1.csv \
-  --output-dir runtime/training/fight-tsn-v1 \
+  --output-dir runtime/training/fight-tsn-new \
   --epochs 20 \
   --batch-size 8
 
 .venv/bin/campus-safety-export-fight-onnx \
-  --checkpoint runtime/training/fight-tsn-v1/best.pt \
-  --output runtime/training/fight-tsn-v1/fight-tsn.onnx
+  --checkpoint runtime/training/fight-tsn-new/best.pt \
+  --output runtime/training/fight-tsn-new/fight-tsn.onnx
 
 .venv/bin/campus-safety-evaluate-fight \
   --project-root . \
   --manifest datasets/manifests/fight-v1.csv \
-  --checkpoint runtime/training/fight-tsn-v1/best.pt \
+  --checkpoint runtime/training/fight-tsn-new/best.pt \
   --split test \
-  --output runtime/training/fight-tsn-v1/test-evaluation.json
+  --output runtime/training/fight-tsn-new/test-evaluation.json
 ```
 
-训练输出包含逐 epoch 的 `metrics.jsonl`、验证 F1 最优的 `best.pt`、ONNX 模型、输入预处理元数据和独立 split 评估报告。当前 `fight-tsn-v1` 的公开数据 test split 为 92 段，实测 F1 `0.803738`（TP 43、TN 28、FP 13、FN 8）；这仍只是公开数据基线，最终阈值与验收必须使用按摄像头或日期隔离的校园视频。
+训练输出包含逐 epoch 的 `metrics.jsonl`、验证 F1 最优的 `best.pt` 和含参数/数据指纹/运行状态的 `run.json`；导出与评估命令另生成 ONNX、预处理元数据和 split 报告。非空训练目录与已有评估报告会拒绝覆盖；不传 `--output-dir` 时自动创建独立实验目录。继续优化可用 `--init-checkpoint` 初始化新微调实验，`--patience` 控制早停；这是新实验，不恢复旧优化器状态。示例目录使用后再次训练需换名。
+
+模型与阈值必须仅通过验证集选择。评估 `--split val --select-threshold` 可按 balanced accuracy 选视频分类阈值；最终 `--split test --threshold-report <验证报告>` 会校验模型及清单 SHA 后应用已冻结阈值。该阈值不自动替代在线事件的开始/结束迟滞阈值。评估报告保留逐视频预测、分数据集误报/漏报及含解码的吞吐。
+
+原 `fight-tsn-v1` 的公开数据 test split 为 92 段，F1 `0.803738`（TP 43、TN 28、FP 13、FN 8）；这仍只是公开数据基线，最终阈值与验收必须使用按摄像头或日期隔离的校园视频。
+
+低内存微调可使用 `--batch-size 2 --accumulation-steps 4 --freeze-batch-norm`：累积梯度后更新，固定 BatchNorm 运行统计，名义有效批量为 8。视频采样采用有界顺序解码，较大跳距仍使用 seek。实际对照训练、验证/测试指标和后续验收边界见 [2026-09-21 训练优化报告](docs/training/optimization-2026-09-21.md)。
 
 ## 安装真实 YOLO 能力
 
@@ -178,7 +184,7 @@ EasyAIoT 视频 CLI 自动启用后台发送。SQLite 连接分别由分析线�
 
 ```bash
 .venv/bin/python -m campus_safety_ai.apps.deliver_events \
-  --platform-config configs/platform/easyaiot-mini-dev.toml --status
+  --outbox runtime/outbox.sqlite3 --status
 ```
 
 平台恢复后独立补传（不重新执行视频推理）：
@@ -188,8 +194,10 @@ EasyAIoT 视频 CLI 自动启用后台发送。SQLite 连接分别由分析线�
   --platform-config configs/platform/easyaiot-mini-dev.toml
 ```
 
-用 `--outbox` 指定其他队列；`--retry-base`、`--retry-max` 设置补传退避秒数。默认 1 秒起步、指数递增、上限 60 秒；按整条队列 FIFO 发送，失败队首不会被后续 END 越过，也会暂时阻塞其他事件。失败只保存异常类型，避免将凭据写入错误字段。
+将上述 `--outbox` 替换为实际队列路径；也可用 `--platform-config` 从配置读取路径。只读检查无需鉴权 token，不创建或迁移数据库。状态包含待发记录数 `pending`、可发送事件数 `readyEvents`、退避事件数 `deferredEvents`、被同事件前序记录阻塞的数量 `blockedRecords`，以及最早队首的下次尝试时间 `nextAttemptAt`（Unix 秒，0 表示立即可发，空队列为 null）。`head` 保留全局最早待发记录，不能代表所有事件都被它阻塞。
 
-旧数据库增加 attempts/next_attempt_at/last_error 前，若已有事件会生成邻接的 `.backup-<id>.sqlite3` 备份；旧事件和 delivered 状态保留。退出最多等待约 3 秒，未完成事件继续保留；正在进行的 HTTP 请求可能到其超时才结束，日志会明确提示。
+`--retry-base`、`--retry-max` 设置补传退避秒数。默认 1 秒起步、指数递增、上限 60 秒。后台/`drain_due()` 按 `eventId` 隔离重试：同一事件按入队顺序发送，START 失败时其 END 等待，但其他事件可继续。调用方须按 revision 顺序入队；不保证不同事件的全局顺序。每批最多尝试 200 条，损坏 JSON 也会作为该事件的失败记录保留，不终止整个消费者。失败只保存异常类型，避免将凭据写入错误字段。Python 旧同步 `flush()` 保留立即发送、失败抛异常的语义，不执行后台退避策略。
 
-同一 outbox 在本机只允许一个后台发送器（macOS/Linux 文件锁）。补传前停止占用该队列的分析进程，或等待其退出。不要同时运行绕过该锁的旧同步 flush。语义仍是至少一次：接收端事务去重、按事件生命周期合并、永久错误人工处理和积压容量治理尚未实现。
+旧数据库增加重试字段或 `event_id` 前，若已有事件会生成邻接的 `.backup-<id>.sqlite3` 备份；旧事件、退避时间和 delivered 状态保留。`event_id` 从原 payload 回填，无法解析的旧记录使迁移回滚并保留备份，需要先检查该记录。退出最多等待约 3 秒，未完成事件继续保留；正在进行的 HTTP 请求可能到其超时才结束，日志会明确提示。
+
+同一 outbox 在本机只允许一个发送器（macOS/Linux 文件锁）；同步 `flush()` / `drain_due()` 和后台发送共享此锁，独立生产者仍可入队。后台有界退出后若请求仍在进行，锁会持续到请求真正结束。补传前停止占用该队列的分析进程，或等待其退出，不混跑旧版本发送器。语义仍是至少一次：接收端事务去重、按事件生命周期合并、永久错误人工处理和积压容量治理尚未实现。

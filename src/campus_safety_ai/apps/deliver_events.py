@@ -6,42 +6,41 @@ import json
 import signal
 import sqlite3
 import threading
+from contextlib import closing
 from pathlib import Path
 
 from campus_safety_ai.adapters.easyaiot import build_platform_destination
 from campus_safety_ai.core.background_delivery import BackgroundDelivery
+from campus_safety_ai.core.event_delivery import read_outbox_status
 from campus_safety_ai.settings import load_platform_settings
 
 
 def inspect_outbox(database: Path) -> dict:
     # Read-only mode must not create or migrate a database just to inspect it.
-    with sqlite3.connect(database.resolve().as_uri() + "?mode=ro", uri=True) as connection:
-        columns = {r[1] for r in connection.execute("PRAGMA table_info(outbox)")}
-        pending = connection.execute("SELECT COUNT(*) FROM outbox WHERE delivered=0").fetchone()[0]
-        if "attempts" not in columns:
-            return {"pending": pending, "schema": "legacy"}
-        row = connection.execute(
-            "SELECT attempts,next_attempt_at,last_error FROM outbox "
-            "WHERE delivered=0 ORDER BY rowid LIMIT 1"
-        ).fetchone()
-        return {"pending": pending, "head": None if row is None else {
-            "attempts": row[0], "nextAttemptAt": row[1], "errorType": row[2],
-        }}
+    with closing(sqlite3.connect(database.resolve().as_uri() + "?mode=ro", uri=True)) as connection:
+        return read_outbox_status(connection)
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--platform-config", required=True, type=Path)
+    parser.add_argument("--platform-config", type=Path)
     parser.add_argument("--outbox", type=Path)
     parser.add_argument("--status", action="store_true", help="read only; never send events")
     parser.add_argument("--retry-base", type=float, default=1)
     parser.add_argument("--retry-max", type=float, default=60)
     args = parser.parse_args()
-    settings = load_platform_settings(args.platform_config)
-    database = args.outbox or settings.outbox
     if args.status:
+        database = args.outbox
+        if database is None:
+            if args.platform_config is None:
+                parser.error("--status requires --outbox or --platform-config")
+            database = load_platform_settings(args.platform_config).outbox
         print(json.dumps(inspect_outbox(database), ensure_ascii=False))
         return
+    if args.platform_config is None:
+        parser.error("--platform-config is required to resume delivery")
+    settings = load_platform_settings(args.platform_config)
+    database = args.outbox or settings.outbox
     if not database.is_file():
         parser.error("outbox does not exist; nothing to resume")
     stop = threading.Event()

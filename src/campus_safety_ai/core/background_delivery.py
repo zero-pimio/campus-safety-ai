@@ -1,7 +1,6 @@
 """One local producer and one independently connected, retrying consumer."""
 from __future__ import annotations
 
-import fcntl
 import logging
 import math
 import threading
@@ -10,6 +9,7 @@ from pathlib import Path
 
 from campus_safety_ai.contracts import EventRecord
 from campus_safety_ai.core.event_delivery import Destination, EventDelivery
+from campus_safety_ai.core.outbox_lease import OutboxLease
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 class BackgroundDelivery:
     """Persist before returning from submit. Network work stays on a worker.
 
-    A filesystem lock permits one background consumer per outbox on this host.
+    A filesystem lock permits one sender per outbox on this host.
     Delivery remains at least once; receivers must implement deduplication.
     """
 
@@ -31,16 +31,11 @@ class BackgroundDelivery:
             raise ValueError("retry_max must be at least retry_base")
         database = database.resolve()
         database.parent.mkdir(parents=True, exist_ok=True)
-        self._lock = database.with_name(database.name + ".worker.lock").open("a")
-        try:
-            fcntl.flock(self._lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        except OSError:
-            self._lock.close()
-            raise RuntimeError("another delivery worker already owns this outbox") from None
+        self._lease = OutboxLease(database).acquire()
         try:
             self._producer = EventDelivery(database, destination)
         except BaseException:
-            self._lock.close()
+            self._lease.close()
             raise
         self._stop = threading.Event()
         self._wake = threading.Event()
@@ -53,7 +48,7 @@ class BackgroundDelivery:
             consumer = None
             try:
                 # SQLite's thread affinity is respected: construct and close here.
-                consumer = EventDelivery(database, destination)
+                consumer = EventDelivery(database, destination, _lease=self._lease)
                 while not self._stop.is_set():
                     consumer.drain_due(retry_base=retry_base, retry_max=retry_max, should_stop=self._stop.is_set)
                     self._changed.set()
@@ -67,10 +62,17 @@ class BackgroundDelivery:
                     if consumer is not None:
                         consumer.close()
                 finally:
-                    self._lock.close()
+                    self._lease.close()
 
         self._thread = threading.Thread(target=work, name="event-delivery", daemon=True)
-        self._thread.start()
+        try:
+            self._thread.start()
+        except BaseException:
+            try:
+                self._producer.close()
+            finally:
+                self._lease.close()
+            raise
 
     def _check(self) -> None:
         if self._closed:

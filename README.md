@@ -11,6 +11,8 @@ FramePacket → Detections → Tracks → EventRecord → SQLite Outbox → Dest
 - 五类稳定契约 `FramePacket`、`Detections`、`Track`、`BehaviorObservation`、`EventRecord` 全部带校验与序列化对称；
 - 可配置的简单 IoU / Ultralytics ByteTrack 跟踪 adapter；轨迹超时会主动收口事件；
 - 使用真实时间戳的人员非法闯入状态机；
+- 本地视频的 YOLO → 跟踪 → 闯入/车辆驻留规则 → 截图证据 → Outbox 入口；
+- 按固定驻留起点计算累计位移的车辆违停规则，支持冷却、漏检中断及源周期收口；
 - 归一化多边形禁区、底部中心点判定、进入/离开延时和冷却；
 - SQLite 持久 Outbox、幂等入队、分块 flush、JSONL/内存目标；
 - 视频源周期结束时的 `finalize` 收口，断流或回放播完不会留下悬挂的 OPEN 事件；
@@ -83,9 +85,34 @@ brew install python@3.11
 
 换成自己的 MP4 时只需修改 `--video`。命令会输出每个窗口的 `fight_score`，并写入 `*-observations.jsonl` 与 `*-events.jsonl`。官方模型固定使用 8 帧窗口，`fight=1`；适配器始终取 `softmax(logits)[1]`，不会把非打架类的 top-1 置信度误当成打架分数。
 
-可视化视频中的绿色框来自 YOLO26n 的通用 `person` 检测；打架分数来自整幅画面的视频分类，不表示某一个绿色框中的人已被单独判定为打架。达到阈值时整幅画面显示红色边框。
+新版可视化中的青色框来自 YOLO26n 的通用 `person` 检测；打架分数来自整幅画面的视频分类，不能判定具体参与者。达到阈值时场景标题和整幅边框显示红色，人物框保持青色。
 
 已验证的官方样例结果：`fi001.mp4` 的打架分数约为 `0.768393`，`nofi001.mp4` 约为 `0.182818`。这只证明链路和标签语义正确，不代表校园场景精度已经达标。模型与安装依据见 [本地视频运行时调研](docs/research/video-fight-runtime.md)，数据来源及许可边界见 [打架数据集调研](docs/research/fight-datasets.md)。
+
+## 跑本地视频闯入与违停规则
+
+新增入口复用现有 YOLO26n 权重和事件投递。需要 `vision` 依赖，模型文件必须已存在，输出目录必须为空。每段录像必须显式选择对应的场景配置；示例区域仅用于功能回放，不代表原视频中真实存在禁区或禁停规定。
+
+```bash
+PYTHONPATH=src .venv/bin/python -m campus_safety_ai.apps.scene_video \
+  --video datasets/private/airtlab/violence-detection-dataset/non-violent/cam1/51.mp4 \
+  --event intrusion --scene-config configs/scenes/airtlab-intrusion-demo.toml \
+  --camera-id airtlab-walk-demo --source-epoch 1 \
+  --tracker bytetrack --frame-stride 3 --output-dir runtime/scene-intrusion-demo
+```
+
+车辆规则使用 `--event parking --scene-config <包含 parking_zone 的 TOML>`，策略默认读取 `configs/events/parking-v1.toml`：驻留 30 秒、归一化位置变化不超过 0.02；这是图像中的驻留判断，不包含授权停车、拥堵和世界坐标速度。协议见 [违停规格](docs/event-specs/parking-v1.md)。
+
+每次输出 `run.json`、`detections.jsonl`、独立 `outbox.sqlite3` 及 `annotated.mp4`；有事件时生成截图，默认 JSONL 目标还会生成 `events.jsonl`。显式提供 `--platform-config` 时才使用该配置的目标。检测记录可用相同策略及跟踪器重放：
+
+```bash
+PYTHONPATH=src .venv/bin/python -m campus_safety_ai.apps.offline_replay \
+  --input runtime/scene-intrusion-demo/detections.jsonl \
+  --event intrusion --scene-config configs/scenes/airtlab-intrusion-demo.toml \
+  --tracker bytetrack --output runtime/scene-intrusion-replay/events.jsonl
+```
+
+该新入口仅支持本地恒定帧率录像，时间按原始帧号与文件 FPS 计算；不接受 RTSP。EOF、解码/推理异常及处理中断会尝试关闭已开始的事件，失败状态与证据写入错误留在报告中。实际素材与验证边界见 [本轮记录](docs/audits/2026-09-21/scene-validation.md)。
 
 ## 训练打架分类模型
 

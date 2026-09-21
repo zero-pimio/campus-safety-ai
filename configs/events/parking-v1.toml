@@ -1,0 +1,12 @@
+schema_version = "1.0"
+config_version = "parking-v1"
+edge_id = "edge-dev-01"
+event_type = "illegal_parking"
+target_labels = ["car", "truck", "bus", "motorcycle"]
+minimum_confidence = 0.40
+stationary_seconds = 30.0
+# 归一化图像底部中心点相对固定驻留起点的距离，不是世界速度。
+movement_threshold = 0.02
+exit_seconds = 2.0
+cooldown_seconds = 30.0
+max_observation_gap_seconds = 2.0

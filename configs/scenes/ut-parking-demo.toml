@@ -1,0 +1,8 @@
+schema_version = "1.0"
+config_version = "ut-parking-demo-v1"
+camera_id = "ut-parking-demo"
+# Artificial zone. UT Interaction has no illegal-parking annotation or permission context.
+[parking_zone]
+zone_id = "demo-left-edge"
+polygon_normalized = [[0.0, 0.0], [0.32, 0.0], [0.32, 1.0], [0.0, 1.0]]
+inclusion_point = "bbox_bottom_center"

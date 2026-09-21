@@ -7,15 +7,17 @@ from pathlib import Path
 from campus_safety_ai.adapters.easyaiot import build_platform_destination
 from campus_safety_ai.apps.common import default_analysis
 from campus_safety_ai.contracts import Detections
-from campus_safety_ai.core.event_analysis import EventAnalysis
+from campus_safety_ai.core.parking_analysis import ParkingAnalysis
+from campus_safety_ai.core.scene_pipeline import SceneAnalysis
+from campus_safety_ai.adapters.runtimes.tracker_factory import build_tracker
 from campus_safety_ai.core.event_delivery import Destination, EventDelivery, JsonlDestination
-from campus_safety_ai.settings import PROJECT_ROOT, load_platform_settings
+from campus_safety_ai.settings import PROJECT_ROOT, load_parking_policy, load_platform_settings
 
 
 def run(
     input_path: Path,
     output_path: Path,
-    analysis: EventAnalysis | None = None,
+    analysis: SceneAnalysis | None = None,
     *,
     destination: Destination | None = None,
     outbox_path: Path | None = None,
@@ -51,10 +53,10 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Replay fixed detections through event analysis")
     parser.add_argument("--input", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--event", choices=("intrusion", "parking"), default="intrusion")
     parser.add_argument(
         "--event-config",
         type=Path,
-        default=PROJECT_ROOT / "configs/events/intrusion-v1.toml",
     )
     parser.add_argument(
         "--scene-config",
@@ -70,10 +72,18 @@ def main() -> None:
         platform = load_platform_settings(arguments.platform_config)
         destination = build_platform_destination(platform, events_path=arguments.output)
         outbox_path = platform.outbox
+    event_config = arguments.event_config or PROJECT_ROOT / f"configs/events/{arguments.event}-v1.toml"
+    analysis = (
+        default_analysis(event_config, arguments.scene_config, arguments.tracker)
+        if arguments.event == "intrusion" else ParkingAnalysis(
+            load_parking_policy(event_config, arguments.scene_config),
+            build_tracker(arguments.tracker or "simple_iou"),
+        )
+    )
     count = run(
         arguments.input,
         arguments.output,
-        default_analysis(arguments.event_config, arguments.scene_config, arguments.tracker),
+        analysis,
         destination=destination,
         outbox_path=outbox_path,
     )

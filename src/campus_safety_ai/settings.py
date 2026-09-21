@@ -7,6 +7,7 @@ from typing import Any, Literal
 
 from campus_safety_ai.core.event_analysis import IntrusionPolicy
 from campus_safety_ai.core.fight_analysis import FightPolicy
+from campus_safety_ai.core.parking_analysis import ParkingPolicy
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -98,6 +99,27 @@ def load_intrusion_policy(
         config_version=str(event["config_version"]),
         event_type=str(event.get("event_type", "intrusion")),
         target_label=target_labels[0] if target_labels else "person",
+        max_observation_gap_seconds=float(event.get("max_observation_gap_seconds", 2.0)),
+    )
+
+
+def load_parking_policy(event_path: Path, scene_path: Path) -> ParkingPolicy:
+    event = _read(event_path)
+    zone = _read(scene_path)["parking_zone"]
+    return ParkingPolicy(
+        edge_id=str(event.get("edge_id", "edge-dev-01")),
+        zone_id=str(zone["zone_id"]),
+        polygon=tuple((float(point[0]), float(point[1])) for point in zone["polygon_normalized"]),
+        target_labels=tuple(str(label) for label in event.get(
+            "target_labels", ["car", "truck", "bus", "motorcycle"]
+        )),
+        minimum_confidence=float(event.get("minimum_confidence", 0.4)),
+        stationary_seconds=float(event.get("stationary_seconds", 30.0)),
+        movement_threshold=float(event.get("movement_threshold", 0.02)),
+        exit_seconds=float(event.get("exit_seconds", 2.0)),
+        cooldown_seconds=float(event.get("cooldown_seconds", 30.0)),
+        max_observation_gap_seconds=float(event.get("max_observation_gap_seconds", 2.0)),
+        config_version=str(event["config_version"]),
     )
 
 

@@ -1,0 +1,8 @@
+schema_version = "1.0"
+config_version = "airtlab-intrusion-demo-v1"
+camera_id = "airtlab-walk-demo"
+# Artificial zone for a functional replay. The source has no intrusion ground truth.
+[intrusion_zone]
+zone_id = "demo-right-side"
+polygon_normalized = [[0.45, 0.15], [0.99, 0.15], [0.99, 0.99], [0.45, 0.99]]
+inclusion_point = "bbox_bottom_center"

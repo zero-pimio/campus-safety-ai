@@ -1,0 +1,11 @@
+AIRTLab: A Dataset for Automatic Violence Detection in Videos
+
+Original authors: Miriana Bianculli, Nicola Falcionelli, Paolo Sernani, Selene Tomassini, Paolo Contardo, Mara Lombardi, Aldo Franco Dragoni.
+Source: https://github.com/airtlab/A-Dataset-for-Automatic-Violence-Detection-in-Videos
+
+Dataset Release Agreement (author README):
+The dataset is freely released for research and educational purposes. Please cite as
+
+M. Bianculli et al., A dataset for automatic violence detection in videos, Data in Brief 33 (2020), 106587. https://doi.org/10.1016/j.dib.2020.106587
+
+This site is a noncommercial research demonstration. It adds actual model scores, detections, configured scene rules and explanatory overlays to violent/cam1/101 and non-violent/cam1/51. The scenes are acted. The original authors do not endorse this system or its results. No broader commercial license or CC license for the dataset is asserted.

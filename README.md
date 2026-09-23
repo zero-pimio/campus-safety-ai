@@ -2,11 +2,19 @@
 
 ## 视频演示
 
-**2026-09-23 更新：** [各模块演示与复现说明](docs/demos/README.md) 汇总打架、固定窗口跌倒、人员入侵和新版车辆识别的实际结果。车辆识别已换用 50 秒停车场全景，逐帧运行 1500 帧；遮挡时仍有车型误判与低分，不能称为违停告警验收通过。最新本地演示和训练权重不随代码分发；第三方新素材请从说明中的官方来源取得，再本地生成视频。
+**[打开在线视频展示页：打架、跌倒持续告警、人员入侵及两段历史演示](https://zero-pimio.github.io/campus-safety-ai/)**
 
-每个模块完成必须附演示视频，要求与缺项见 [视频交付清单](docs/demos/DELIVERY.md)。车辆闯道闸和人员闯门禁的 [联合设计](docs/design/access-control-v1.md) 已完成，尚未接入运行代码或控制器。下方公开 URFD 动图为历史版本。
+2026-09-23 更新：新增三段真实结果回放，支持播放、全屏和下载。点击下方画面直达对应视频。
 
-下方动图展示 URFD 历史模型在连续录像中的识别结果；点击动图可打开完整 MP4，也可以进入 [历史视频展示页](https://zero-pimio.github.io/campus-safety-ai/) 全屏观看和下载。
+| 打架识别 · 6.1 秒 | 跌倒持续告警 · 5.6 秒 | 人员入侵 · 5 秒 |
+| --- | --- | --- |
+| [![打架识别演示](exports/github-pages-showcase/assets/fight-latest-poster.jpg)](https://zero-pimio.github.io/campus-safety-ai/#fight) | [![跌倒持续告警演示](exports/github-pages-showcase/assets/fall-latest-poster.jpg)](https://zero-pimio.github.io/campus-safety-ai/#fall) | [![人员入侵演示](exports/github-pages-showcase/assets/intrusion-latest-poster.jpg)](https://zero-pimio.github.io/campus-safety-ai/#intrusion) |
+
+这些是阶段成果：打架与入侵片段在视频结束时收口；新跌倒片段因轨迹变化收口，人仍倒地，不能当作“已恢复”。页面逐项列出模型、素材来源、许可和不足。新候选权重与完整推理缓存未公开；在线播放不代表克隆后可复现同一分数。
+
+车辆识别已换用 50 秒停车场全景，逐帧运行 1500 帧，目前保留本地展示与[复现说明](docs/demos/README.md)。遮挡时仍有车型误判与低分，对应停车规则未触发告警；素材的派生视频公开再分发范围尚未确认。车辆闯道闸和人员闯门禁的[联合设计](docs/design/access-control-v1.md)已完成，暂无运行演示。
+
+每个模块完成必须附演示视频，要求与缺项见[视频交付清单](docs/demos/DELIVERY.md)。以下 URFD 动图及两段完整 MP4 为历史版本，也可在上述展示页观看。
 
 **跌倒动作识别 · 3.3 秒**
 

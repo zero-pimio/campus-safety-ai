@@ -1,10 +1,12 @@
 # 各模块演示视频交付与验收
 
-GitHub 读者请先看[演示与本地复现](README.md)。下文记录工作区内已生成的视频与验收情况，`runtime/` 路径均为未公开分发的本地产物；其存在不表示克隆仓库后已有视频或实验权重。
+GitHub 读者请先看[演示与本地复现](README.md)。下文记录工作区内已生成的视频与验收情况，`runtime/` 路径均为本地产物；其中选定演示另复制到公开展示目录，不包含原始素材集合、完整缓存或实验权重。
 
 2026-09-23 根据用户要求新增：**每个项目模块完成时必须交付可播放演示视频，并向用户展示。代码、截图、模型权重或 JSON 不能替代视频交付。** 此要求适用于本轮六个模块及之后明确新增的模块。
 
 ## 当前可观看的交付
+
+**在线入口：[GitHub Pages 视频展示页](https://zero-pimio.github.io/campus-safety-ai/)**。2026-09-23 新增打架、固定窗口跌倒和人员入侵三段，保留两段 URFD 历史演示；共 5 段。车辆新视频保留本地，两项闯卡为设计状态。公开文件 SHA、时长、帧数与完整解码检查见[媒体核验](../../exports/github-pages-showcase/verification.json)，各素材条款见[展示页说明](../../exports/github-pages-showcase/README.md)。
 
 统一展示页：本地演示页（本地产物：`runtime/demos/showcase-20260923/index.html`）。在文件浏览器打开 index.html 即可播放、全屏观看或下载各 MP4；目录可整体搬移，页面不请求外网资源。文件清单、SHA 和媒体核验见同目录 catalog.json、gallery-verification.json。原始历史演示保留，新页面只做汇集和必要兼容转码。
 

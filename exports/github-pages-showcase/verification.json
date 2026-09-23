@@ -1,0 +1,79 @@
+{
+  "checked_date": "2026-09-23",
+  "scope": "Media integrity only; not model accuracy, campus acceptance or hardware performance.",
+  "decode_note": "Uses demux time base and passthrough frame timing to preserve variable-frame-rate timestamps. Historical files retain their original Level 6.0 metadata; new files are Level 4.1 or lower. Browser playback checked separately.",
+  "videos": [
+    {
+      "id": "fight",
+      "file": "assets/fight.mp4",
+      "sha256": "8d54db7dae8625eaf8b9c994873c62cb859fa15ebae668f8a5c5f48b59c8ecfb",
+      "frames": 182,
+      "duration_seconds": 6.066667,
+      "codec": "h264",
+      "pixel_format": "yuv420p",
+      "level": 32,
+      "strictly_increasing_pts": true,
+      "full_decode_passed": true
+    },
+    {
+      "id": "fall",
+      "file": "assets/fall-continuous.mp4",
+      "sha256": "0fb8c0bc437f1349106469444d0645d6dbb1a5f4cbed092587c51da520abd657",
+      "frames": 167,
+      "duration_seconds": 5.601633,
+      "codec": "h264",
+      "pixel_format": "yuv420p",
+      "level": 41,
+      "strictly_increasing_pts": true,
+      "full_decode_passed": true
+    },
+    {
+      "id": "intrusion",
+      "file": "assets/intrusion.mp4",
+      "sha256": "c9c3ef118131ff7207c2865df52488a29058c3db398652e0e61d03bd5d01397b",
+      "frames": 50,
+      "duration_seconds": 5.0,
+      "codec": "h264",
+      "pixel_format": "yuv420p",
+      "level": 31,
+      "strictly_increasing_pts": true,
+      "full_decode_passed": true
+    },
+    {
+      "id": "fall-history",
+      "file": "assets/fall-detection.mp4",
+      "sha256": "2c0e9041a7b60109bf579113139f0e57c9904eef202bf67b54a4869d4578766d",
+      "frames": 100,
+      "duration_seconds": 3.304,
+      "codec": "h264",
+      "pixel_format": "yuv420p",
+      "level": 60,
+      "strictly_increasing_pts": true,
+      "full_decode_passed": true
+    },
+    {
+      "id": "walk-history",
+      "file": "assets/walking.mp4",
+      "sha256": "2b85870e7313575bda929fdd949f044b0719dd8701c07457974c27e4dd458e68",
+      "frames": 300,
+      "duration_seconds": 9.969,
+      "codec": "h264",
+      "pixel_format": "yuv420p",
+      "level": 60,
+      "strictly_increasing_pts": true,
+      "full_decode_passed": true
+    }
+  ],
+  "browser_verification": {
+    "browser": "Codex in-app browser",
+    "date": "2026-09-23",
+    "scope": "Local HTTP preview of the publication directory; full natural playback to ended=true for all five files.",
+    "all_available_videos_reached_end": true,
+    "media_errors": 0,
+    "full_screen_controls_visible": true,
+    "full_screen_exit_checked": true,
+    "hash_selection_on_reload_checked": true,
+    "parking_and_design_entries_have_no_video_source": true,
+    "switching_does_not_autoplay": true
+  }
+}

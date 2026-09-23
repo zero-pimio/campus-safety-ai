@@ -37,3 +37,7 @@ GMDCSA 根仓库附 MIT 文本，快照已保存；UP-Fall 官方允许公开研
 **仍缺嬉闹、独立校园长录像及完整“正常→跌倒→恢复”的人工事件标注。** 弯腰和坐起已增加，但不能据此宣称已覆盖所有蹲下/遮挡/多人场景。此批未触碰旧训练集、测试划分或模型权重。
 
 连续告警和事件评估工具已完成本地验证，使用方法见 [工程交付记录](../training/fall-streaming-2026-09-23.md)。
+
+## 2026-09-23 演示发布补充
+
+本条补充后续发布状态，不改写以上下载快照。[GMDCSA24 作者固定提交的根 LICENSE](https://github.com/ekramalam/GMDCSA24-A-Dataset-for-Human-Fall-Detection-in-Videos/blob/5abac7693229900cf80f722e878fbb119211fc1c/LICENSE)采用 MIT；Subject3/Fall03 的识别回放现按该许可公开，完整版权与许可文本保存在[展示目录](../../exports/github-pages-showcase/licenses/GMDCSA24-MIT.txt)。原始视频集合、模型权重和推理缓存仍未发布。UP-Fall 状态不变。公开视频不表示跨摄像头泛化或现场验收通过。

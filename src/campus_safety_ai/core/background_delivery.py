@@ -23,7 +23,8 @@ class BackgroundDelivery:
 
     def __init__(self, database: Path, destination: Destination, *, retry_base: float = 1,
                  retry_max: float = 60, poll_seconds: float = 0.1,
-                 shutdown_seconds: float = 3) -> None:
+                 shutdown_seconds: float = 3, max_pending_records: int | None = None,
+                 max_pending_bytes: int | None = None) -> None:
         for value in (retry_base, retry_max, poll_seconds, shutdown_seconds):
             if not math.isfinite(value) or value <= 0:
                 raise ValueError("delivery timing values must be finite and positive")
@@ -33,7 +34,8 @@ class BackgroundDelivery:
         database.parent.mkdir(parents=True, exist_ok=True)
         self._lease = OutboxLease(database).acquire()
         try:
-            self._producer = EventDelivery(database, destination)
+            self._producer = EventDelivery(database, destination, max_pending_records=max_pending_records,
+                                           max_pending_bytes=max_pending_bytes)
         except BaseException:
             self._lease.close()
             raise

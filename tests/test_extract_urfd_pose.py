@@ -2,7 +2,12 @@ import importlib.util
 import unittest
 from pathlib import Path
 
-import numpy as np
+try:
+    import numpy as np
+except ModuleNotFoundError as error:
+    if error.name != "numpy":
+        raise
+    raise unittest.SkipTest("optional numpy dependency is not installed") from error
 
 SPEC = importlib.util.spec_from_file_location(
     "extract_urfd_pose", Path(__file__).resolve().parents[1] / "scripts/extract_urfd_pose.py",

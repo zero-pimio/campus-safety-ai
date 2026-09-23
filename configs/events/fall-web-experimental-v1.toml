@@ -1,0 +1,15 @@
+# Experimental candidate only; not the default campus deployment.
+# Selected on Subject3 validation: 2/2 falls detected, 2 false alarms.
+# END means motion cleared, source ended or track lost; not person recovery.
+schema_version = "1.0"
+edge_id = "edge-dev-01"
+start_score = 0.8
+end_score = 0.25
+confirm_seconds = 0.2
+clear_seconds = 1
+cooldown_seconds = 2
+max_observation_gap_seconds = 1.0
+config_version = "fall-window-web-v1"
+event_type = "person_falling"
+max_cameras = 256
+max_evidence_uris = 8

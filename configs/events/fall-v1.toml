@@ -1,0 +1,17 @@
+schema_version = "1.0"
+config_version = "fall-v1"
+edge_id = "edge-dev-01"
+event_type = "person_falling"
+start_score = 0.5
+end_score = 0.35
+# These are continuous observation times, not the video-window duration.
+# Untuned engineering defaults. No event-annotation validation has been done;
+# these values have not been selected by trying validation/test-set results.
+# start_score retains the frozen classifier's existing threshold.
+confirm_seconds = 0.3
+clear_seconds = 1.0
+cooldown_seconds = 2.0
+max_observation_gap_seconds = 1.0
+max_cameras = 256
+max_evidence_uris = 8
+# Low scores end falling motion; they do not prove that a person is safe.

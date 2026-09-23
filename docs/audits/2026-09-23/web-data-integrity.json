@@ -1,0 +1,13 @@
+{
+  "verified_downloaded_files": 23,
+  "unique_sha256_count": 23,
+  "existing_same_size_candidates_hashed": 0,
+  "exact_byte_duplicate_matches": [],
+  "scope": "Byte identity only. Re-encoded or overlapping videos need source-group review.",
+  "visual_spot_checks": [
+    "Subject 1/ADL/15.mp4",
+    "Subject 3/ADL/07.mp4",
+    "Subject 4/ADL/05.mp4"
+  ],
+  "visual_scope": "One mid-clip frame each; real household images verified, not event boundary annotation."
+}

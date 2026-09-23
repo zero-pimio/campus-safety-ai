@@ -12,6 +12,22 @@ from campus_safety_ai.apps.deliver_events import inspect_outbox, main
 
 
 class OutboxStatusTests(unittest.TestCase):
+    def expected_storage_metrics(self, database_bytes: int) -> dict:
+        # Calculate against the fixture's actual UTF-8 payloads independently
+        # of the status SQL; the delivered row contributes only to total bytes.
+        payloads = [json.dumps({"eventId": event, "revision": revision}).encode("utf-8")
+                    for event, revision in (("a", 1), ("a", 2), ("b", 1), ("c", 1))]
+        return {
+            "pendingBytes": sum(map(len, payloads[:3])),
+            "payloadBytes": sum(map(len, payloads)),
+            "totalRecords": 4,
+            "oldestPendingAt": None,
+            "oldestPendingAgeSeconds": None,
+            "unknownPendingAgeRecords": 3,
+            "databaseBytes": database_bytes,
+            "databaseAuxiliaryBytes": 0,
+        }
+
     def create_outbox(self, database: Path, *, legacy: bool = False, fifo: bool = False) -> None:
         with closing(sqlite3.connect(database)) as connection, connection:
             connection.execute(
@@ -60,6 +76,7 @@ class OutboxStatusTests(unittest.TestCase):
                 "blockedRecords": 1,
                 "nextAttemptAt": 0,
                 "totalAttempts": 6,
+                **self.expected_storage_metrics(len(before)),
             })
             self.assertEqual(database.read_bytes(), before)
             self.assertEqual(list(Path(directory).iterdir()), [database])
@@ -84,6 +101,7 @@ class OutboxStatusTests(unittest.TestCase):
                 "blockedRecords": 2,
                 "nextAttemptAt": 1e20,
                 "totalAttempts": 6,
+                **self.expected_storage_metrics(len(before)),
             })
             self.assertEqual(database.read_bytes(), before)
             self.assertEqual(list(Path(directory).iterdir()), [database])

@@ -1,0 +1,30 @@
+............................................... [ 15%]
+.................................................................................................................. [ 52%]
+.................................. [ 63%]
+...............................................................................................................                                                       [100%]
+=============================== warnings summary ===============================
+tests/test_fall_model.py::FallModelTests::test_full_model_can_be_traced_with_fixed_16_frame_input
+  .venv/lib/python3.11/site-packages/torch/jit/_trace.py:1006: DeprecationWarning: `torch.jit.trace` is deprecated. Please switch to `torch.compile` or `torch.export`.
+    warnings.warn(
+
+tests/test_fall_model.py::FallModelTests::test_full_model_can_be_traced_with_fixed_16_frame_input
+  .venv/lib/python3.11/site-packages/torch/jit/_trace.py:1145: DeprecationWarning: `torch.jit.trace_method` is deprecated. Please switch to `torch.compile` or `torch.export`.
+    warnings.warn(
+
+tests/test_pose_motion.py::PoseClassifierTests::test_onnx_export_matches_torch_for_both_supported_heads
+tests/test_pose_motion.py::PoseClassifierTests::test_onnx_export_matches_torch_for_both_supported_heads
+  tests/test_pose_motion.py:194: DeprecationWarning: You are using the legacy TorchScript-based ONNX export. Starting in PyTorch 2.9, the new torch.export-based ONNX exporter has become the default. Learn more about the new export logic: https://docs.pytorch.org/docs/stable/onnx_export.html. For exporting control flow: https://pytorch.org/tutorials/beginner/onnx/export_control_flow_model_to_onnx_tutorial.html
+    torch.onnx.export(model, example, output, input_names=["motion_features"], output_names=["logits"],
+
+tests/test_pose_motion.py::PoseClassifierTests::test_onnx_export_matches_torch_for_both_supported_heads
+tests/test_pose_motion.py::PoseClassifierTests::test_onnx_export_matches_torch_for_both_supported_heads
+tests/test_train_urfd_pose_motion.py::PoseTrainingIntegrationTests::test_train_freezes_before_test_and_preserves_coverage_and_provenance
+  .venv/lib/python3.11/site-packages/torch/onnx/_internal/torchscript_exporter/utils.py:218: DeprecationWarning: The feature will be removed. Please remove usage of this function
+    setup_onnx_logging(verbose) as log_ctx,
+
+tests/test_train_urfd_pose_motion.py::PoseTrainingIntegrationTests::test_train_freezes_before_test_and_preserves_coverage_and_provenance
+  scripts/train_urfd_pose_motion.py:299: DeprecationWarning: You are using the legacy TorchScript-based ONNX export. Starting in PyTorch 2.9, the new torch.export-based ONNX exporter has become the default. Learn more about the new export logic: https://docs.pytorch.org/docs/stable/onnx_export.html. For exporting control flow: https://pytorch.org/tutorials/beginner/onnx/export_control_flow_model_to_onnx_tutorial.html
+    torch.onnx.export(model.eval(), features[:1], path, input_names=["motion_features"], output_names=["logits"],
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+306 passed, 8 warnings, 288 subtests passed in 14.92s

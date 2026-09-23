@@ -1,0 +1,9 @@
+schema_version = "1.0"
+config_version = "pnnl-parking-demo-v1"
+camera_id = "pnnl-parking-demo"
+# Artificial demonstration zone around the central white car.
+# PNNL footage has no illegal-parking labels; no claim of actual road violation.
+[parking_zone]
+zone_id = "demo-central-bay"
+polygon_normalized = [[0.38, 0.43], [0.64, 0.43], [0.68, 0.72], [0.37, 0.72]]
+inclusion_point = "bbox_bottom_center"

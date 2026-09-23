@@ -1,0 +1,375 @@
+{
+  "created_at": "2026-09-23T01:31:39.206586+00:00",
+  "default_model_replaced": false,
+  "candidate_status": "experimental; insufficient independent subjects/duration; residual false alarm",
+  "validation": {
+    "candidate": {
+      "metrics": {
+        "ground_truth_event_count": 2,
+        "alarm_count": 4,
+        "true_positives": 2,
+        "false_positives": 2,
+        "false_negatives": 0,
+        "precision": 0.5,
+        "recall": 1.0,
+        "miss_rate": 0.0,
+        "false_alarms_per_hour": 215.4686564478861,
+        "false_alarms_per_hour_denominator": "all explicitly annotated camera-session hours",
+        "annotated_hours": 0.009282092499999998,
+        "normal_hours": 0.008686490833333333,
+        "delay_seconds": {
+          "count": 2,
+          "mean": 0.8162835,
+          "median": 0.8162835,
+          "min": 0.800367,
+          "max": 0.8322,
+          "definition": "START observedAt minus truth startedAt; negative allowed only with tolerance"
+        }
+      },
+      "coverage": {
+        "known_seconds": 18.255501000000002,
+        "unknown_seconds": 14.7853,
+        "unobserved_seconds": 0.3747319999999945,
+        "annotated_seconds": 33.415532999999996,
+        "known_fraction": 0.5463178157295892,
+        "unknown_fraction": 0.44246787863596254
+      }
+    },
+    "baseline": {
+      "metrics": {
+        "ground_truth_event_count": 2,
+        "alarm_count": 2,
+        "true_positives": 0,
+        "false_positives": 2,
+        "false_negatives": 2,
+        "precision": 0.0,
+        "recall": 0.0,
+        "miss_rate": 1.0,
+        "false_alarms_per_hour": 215.4686564478861,
+        "false_alarms_per_hour_denominator": "all explicitly annotated camera-session hours",
+        "annotated_hours": 0.009282092499999998,
+        "normal_hours": 0.008686490833333333,
+        "delay_seconds": {
+          "count": 0,
+          "mean": null,
+          "median": null,
+          "min": null,
+          "max": null,
+          "definition": "START observedAt minus truth startedAt; negative allowed only with tolerance"
+        }
+      },
+      "coverage": {
+        "known_seconds": 12.288768,
+        "unknown_seconds": 20.832,
+        "unobserved_seconds": 0.29476499999999817,
+        "annotated_seconds": 33.415532999999996,
+        "known_fraction": 0.3677561569944134,
+        "unknown_fraction": 0.6234226459892172
+      }
+    }
+  },
+  "test": {
+    "candidate": {
+      "metrics": {
+        "ground_truth_event_count": 1,
+        "alarm_count": 2,
+        "true_positives": 1,
+        "false_positives": 1,
+        "false_negatives": 0,
+        "precision": 0.5,
+        "recall": 1.0,
+        "miss_rate": 0.0,
+        "false_alarms_per_hour": 93.69307413768993,
+        "false_alarms_per_hour_denominator": "all explicitly annotated camera-session hours",
+        "annotated_hours": 0.0106731475,
+        "normal_hours": 0.010406490000000001,
+        "delay_seconds": {
+          "count": 1,
+          "mean": 0.768067,
+          "median": 0.768067,
+          "min": 0.768067,
+          "max": 0.768067,
+          "definition": "START observedAt minus truth startedAt; negative allowed only with tolerance"
+        }
+      },
+      "coverage": {
+        "known_seconds": 24.192600000000002,
+        "unknown_seconds": 13.856432999999999,
+        "unobserved_seconds": 0.37429800000000313,
+        "annotated_seconds": 38.423331000000005,
+        "known_fraction": 0.6296330737176327,
+        "unknown_fraction": 0.3606255012091481
+      }
+    },
+    "baseline": {
+      "metrics": {
+        "ground_truth_event_count": 1,
+        "alarm_count": 5,
+        "true_positives": 0,
+        "false_positives": 5,
+        "false_negatives": 1,
+        "precision": 0.0,
+        "recall": 0.0,
+        "miss_rate": 1.0,
+        "false_alarms_per_hour": 468.46537068844964,
+        "false_alarms_per_hour_denominator": "all explicitly annotated camera-session hours",
+        "annotated_hours": 0.0106731475,
+        "normal_hours": 0.010406490000000001,
+        "delay_seconds": {
+          "count": 0,
+          "mean": null,
+          "median": null,
+          "min": null,
+          "max": null,
+          "definition": "START observedAt minus truth startedAt; negative allowed only with tolerance"
+        }
+      },
+      "coverage": {
+        "known_seconds": 14.848434,
+        "unknown_seconds": 23.248199,
+        "unobserved_seconds": 0.3266980000000075,
+        "annotated_seconds": 38.423331000000005,
+        "known_fraction": 0.386443174330721,
+        "unknown_fraction": 0.6050542312429913
+      }
+    }
+  },
+  "heldout": {
+    "source_subjects": 1,
+    "physical_camera_independence": "unknown",
+    "videos": 5,
+    "labeled_falls": 1,
+    "test_count": 1,
+    "test_tuning": false
+  },
+  "artifact_sha256": {
+    "datasets/manifests/fall-web-v1.json": "543fa4df12d416955da4462fecad02ac339d71e5c3b4a5a279c43425821bb37b",
+    "runtime/training/fall-window-selection-20260923.json": "46652b7e9aff360ddf5603dadc65192f3f34d583e2bb921c45b4b916e1684586",
+    "runtime/training/fall-window-web-small-v1-20260923/best.pt": "a64b7c46d980ff28c99e763098c28bc051bd8c88f65af82c299187a0d38fa6d5",
+    "runtime/training/fall-window-web-small-v1-20260923/protocol.json": "60d02b9a6c47bb27cf7fe0cef1c7c6261bbbbbac33b42416a084103d1b657150",
+    "runtime/training/fall-window-web-small-v1-20260923/frozen.json": "be4b17538a63a4f919d5fd9f10780a963de9fefbb28d058202606be8483e5e9e",
+    "runtime/training/fall-window-web-small-v1-20260923/test-evaluation-started.json": "87e6e0ffba8eaee7cfd3e97bd58f691ad78d199ad5204d68075a61b1a4839f63",
+    "runtime/training/fall-window-web-small-v1-20260923/test.json": "7eb72099d637df55deac75df5578774054ccaf21359cd2c705855a4879e8a0f4",
+    "runtime/training/fall-window-web-small-v1-20260923/onnx/model.onnx": "77b88c7751ebdc66eb079c3edc3dbc36334a2fdabb7400de3eddfd57e6bdceed",
+    "models/yolo26s-pose.pt": "a083adb42303728ae14c4bd6bd56d80da46f82fb2564dbd6f31dcc92ea321646",
+    "models/yolo26n-pose.pt": "eb3bb8268828aeaf515cec23a4bfafd793944a86fe9af94ba7823609c14522a9",
+    "runtime/training/fall-pose-dense-v1-20260921/best.pt": "3ae4b6237f16f6c377f118fc1c0b69e9d069765e8d61f13b351e5403d1f1b368",
+    "docs/audits/2026-09-23/project-tests.txt": "08da6d4147eccbf43f000a2d0e4cd80ca9d9f86072512f228e71f687536822b9",
+    "runtime/checks/fall-runtime-small-benchmark-20260923/benchmark.json": "c3b0e1f9eb836c1b02a208242f28d22472dbde7c6a2ca5dea23dff862778a665"
+  },
+  "frozen_event_policy": {
+    "edge_id": "fixed-window-evaluation",
+    "start_score": 0.8,
+    "end_score": 0.25,
+    "confirm_seconds": 0.2,
+    "clear_seconds": 1,
+    "cooldown_seconds": 2,
+    "max_observation_gap_seconds": 1.0,
+    "config_version": "fall-window-web-v1",
+    "event_type": "person_falling",
+    "max_cameras": 256,
+    "max_evidence_uris": 8
+  },
+  "video_cache_parity": {
+    "sample_id": "gmdcsa24-subject-3-fall-03",
+    "split": "val",
+    "actual_decoded_frames": 167,
+    "observation_count": 47,
+    "score_max_abs_difference": 8.940696716308594e-08,
+    "timestamp_basis": "decoded PTS",
+    "source": "real YOLO26s/MPS video versus frozen cache replay/CPU head",
+    "events": [
+      {
+        "schemaVersion": "1.0",
+        "eventId": "3fa4c64d-fc28-5e04-bcac-9cf71edd9463",
+        "revision": 1,
+        "phase": "START",
+        "eventType": "person_falling",
+        "severity": "critical",
+        "edgeId": "edge-dev-01",
+        "cameraId": "gmdcsa24-subject-3-fall-03",
+        "startedAt": "2000-01-01T00:00:01.856233Z",
+        "observedAt": "2000-01-01T00:00:02.112400Z",
+        "endedAt": null,
+        "subjectTrackKeys": [
+          "gmdcsa24-subject-3-fall-03:1:pose-1"
+        ],
+        "confidence": 0.9895007014274597,
+        "modelVersion": "pose-motion-a64b7c46d980ff28",
+        "configVersion": "fall-window-web-v1",
+        "idempotencyKey": "3fa4c64d-fc28-5e04-bcac-9cf71edd9463:1",
+        "status": "OPEN",
+        "evidenceUris": [
+          "runtime/checks/fall-web-small-val-real-20260923/evidence/3fa4c64d-fc28-5e04-bcac-9cf71edd9463.jpg"
+        ],
+        "sourceEpoch": 1,
+        "reason": "confirmed"
+      },
+      {
+        "schemaVersion": "1.0",
+        "eventId": "3fa4c64d-fc28-5e04-bcac-9cf71edd9463",
+        "revision": 2,
+        "phase": "END",
+        "eventType": "person_falling",
+        "severity": "critical",
+        "edgeId": "edge-dev-01",
+        "cameraId": "gmdcsa24-subject-3-fall-03",
+        "startedAt": "2000-01-01T00:00:01.856233Z",
+        "observedAt": "2000-01-01T00:00:03.295967Z",
+        "endedAt": "2000-01-01T00:00:03.295967Z",
+        "subjectTrackKeys": [
+          "gmdcsa24-subject-3-fall-03:1:pose-1"
+        ],
+        "confidence": 0.2980503737926483,
+        "modelVersion": "pose-motion-a64b7c46d980ff28",
+        "configVersion": "fall-window-web-v1",
+        "idempotencyKey": "3fa4c64d-fc28-5e04-bcac-9cf71edd9463:2",
+        "status": "CLOSED",
+        "evidenceUris": [
+          "runtime/checks/fall-web-small-val-real-20260923/evidence/3fa4c64d-fc28-5e04-bcac-9cf71edd9463.jpg"
+        ],
+        "sourceEpoch": 1,
+        "reason": "track_changed"
+      }
+    ]
+  },
+  "head_onnx": {
+    "comparison_runs": [
+      {
+        "batch_size": 1,
+        "checked_features": 156,
+        "maximum_logit_absolute_error": 5.960464477539062e-07,
+        "maximum_probability_absolute_error": 8.182752797569748e-08,
+        "argmax_mismatch_count": 0,
+        "frozen_threshold_mismatch_count": 0,
+        "raw_zero": {
+          "torch_score": 0.005049218889325857,
+          "onnx_score": 0.005049217944675877,
+          "below_frozen_end_threshold": true
+        }
+      },
+      {
+        "batch_size": 64,
+        "checked_features": 156,
+        "maximum_logit_absolute_error": 0.0,
+        "maximum_probability_absolute_error": 6.997048651591342e-08,
+        "argmax_mismatch_count": 0,
+        "frozen_threshold_mismatch_count": 0,
+        "raw_zero": {
+          "torch_score": 0.005049218889325857,
+          "onnx_score": 0.005049217944675877,
+          "below_frozen_end_threshold": true
+        }
+      }
+    ],
+    "maximum_logit_absolute_error": 5.960464477539062e-07,
+    "maximum_probability_absolute_error": 8.182752797569748e-08,
+    "argmax_agreement": true,
+    "frozen_threshold_agreement": true,
+    "absolute_logit_tolerance": 0.0001,
+    "absolute_probability_tolerance": 1e-05
+  },
+  "verification_boundaries": {
+    "local_real_video": true,
+    "injected_rtsp_recovery": true,
+    "actual_rtsp_endurance": false,
+    "platform_end_to_end": false,
+    "rk3588": false,
+    "real_person_recovery": false,
+    "hour_long_false_alarm_measurement": false
+  },
+  "known_failures": [
+    "test pushups generated one false fall event",
+    "unknown36.06percent of test annotated time",
+    "only one test source actor",
+    "public short staged home clips; no campus crowd validation"
+  ],
+  "operations": {
+    "rtsp_retries": 5,
+    "outbox_pending_records": 10000,
+    "outbox_pending_bytes": 67108864,
+    "storage_min_free_bytes": 268435456,
+    "storage_max_run_bytes": 2147483648,
+    "storage_check_every_frames": 30,
+    "retention": "recoverable quarantine; no disk freeing or log/outbox history deletion",
+    "recovery": "local enqueue only; immutable rejected journal and hash receipts"
+  },
+  "small_cpu_benchmark": {
+    "host": {
+      "system": "Darwin",
+      "release": "24.0.0",
+      "architecture": "arm64",
+      "processor": "arm",
+      "logical_cpus": 8,
+      "python": "3.11.16 (main, Aug 12 2026, 23:03:19) [Clang 17.0.0 (clang-1700.6.4.2)]",
+      "packages": {
+        "torch": "2.13.0",
+        "ultralytics": "8.4.128",
+        "numpy": "1.26.4",
+        "opencv-python": "4.11.0.86",
+        "opencv-python-headless": "4.11.0.86"
+      },
+      "device_tree_model": null
+    },
+    "backend": "pytorch-cpu",
+    "rknn_used": false,
+    "measurement": {
+      "processed_frames": 167,
+      "wall_seconds": 15.76140158297494,
+      "video_seconds": 5.601633,
+      "frames_per_wall_second": 10.595504411256742,
+      "video_seconds_per_wall_second": 0.35540195905234334,
+      "stages": {
+        "decode": {
+          "count": 167,
+          "total_seconds": 0.2509878750424832,
+          "minimum_seconds": 0.001058290945366025,
+          "maximum_seconds": 0.020089250057935715,
+          "mean_seconds": 0.0015029214074400192
+        },
+        "pose": {
+          "count": 167,
+          "total_seconds": 15.250463541597128,
+          "minimum_seconds": 0.07541204104200006,
+          "maximum_seconds": 0.2589022908359766,
+          "mean_seconds": 0.09132014096764747
+        },
+        "window_and_event_policy": {
+          "count": 167,
+          "total_seconds": 0.0640354563947767,
+          "minimum_seconds": 8.082948625087738e-06,
+          "maximum_seconds": 0.04706937517039478,
+          "mean_seconds": 0.0003834458466753096
+        },
+        "evidence_and_local_delivery": {
+          "count": 167,
+          "total_seconds": 0.054640539456158876,
+          "minimum_seconds": 0.00019087502732872963,
+          "maximum_seconds": 0.008184958016499877,
+          "mean_seconds": 0.0003271888590189154
+        },
+        "frame_end_to_end": {
+          "count": 167,
+          "total_seconds": 15.620127412490547,
+          "minimum_seconds": 0.07703066617250443,
+          "maximum_seconds": 0.2671727919951081,
+          "mean_seconds": 0.09353369708078171
+        }
+      }
+    },
+    "peak_rss_bytes": 382779392,
+    "total_wall_seconds": 18.888142291922122,
+    "video_time_source": "ffprobe decoded best_effort_timestamp_time minus first PTS"
+  },
+  "verification": {
+    "pytest_passed": 499,
+    "pytest_skipped": 0,
+    "subtests_passed": 320,
+    "warnings": 10,
+    "warnings_scope": "torch tracing and legacy ONNX exporter deprecations",
+    "ruff": "passed",
+    "git_diff_check": "passed",
+    "real_benchmark_artifact_checked_in_full_suite": true,
+    "editable_cli_install": "passed"
+  }
+}

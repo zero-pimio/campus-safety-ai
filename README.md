@@ -2,7 +2,11 @@
 
 ## 视频演示
 
-下方动图直接展示新版模型在真实连续录像中的识别结果；点击动图可打开完整 MP4，也可以进入 [视频展示页](https://zero-pimio.github.io/campus-safety-ai/) 全屏观看和下载。
+**2026-09-23 更新：** [各模块演示与复现说明](docs/demos/README.md) 汇总打架、固定窗口跌倒、人员入侵和新版车辆识别的实际结果。车辆识别已换用 50 秒停车场全景，逐帧运行 1500 帧；遮挡时仍有车型误判与低分，不能称为违停告警验收通过。最新本地演示和训练权重不随代码分发；第三方新素材请从说明中的官方来源取得，再本地生成视频。
+
+每个模块完成必须附演示视频，要求与缺项见 [视频交付清单](docs/demos/DELIVERY.md)。车辆闯道闸和人员闯门禁的 [联合设计](docs/design/access-control-v1.md) 已完成，尚未接入运行代码或控制器。下方公开 URFD 动图为历史版本。
+
+下方动图展示 URFD 历史模型在连续录像中的识别结果；点击动图可打开完整 MP4，也可以进入 [历史视频展示页](https://zero-pimio.github.io/campus-safety-ai/) 全屏观看和下载。
 
 **跌倒动作识别 · 3.3 秒**
 
@@ -12,7 +16,7 @@
 
 [![日常走路识别动图：本片段未出现跌倒误报](docs/media/walking-preview.gif)](https://zero-pimio.github.io/campus-safety-ai/assets/walking.mp4)
 
-红色表示检测到跌倒动作，绿色表示未见跌倒动作，黄色表示预热或无法判断。动图经过缩小和降帧率处理，完整 MP4 保留原始连续帧与播放时间。两段均为开发验证素材；跌倒开始阶段仍有判断抖动，不代表已通过真实校园验收。
+红色表示检测到跌倒动作，绿色表示未见跌倒动作，黄色表示预热或无法判断。动图经过缩小和降帧率处理，完整 MP4 保留原始连续帧与播放时间。两段均为开发验证素材；跌倒开始阶段仍有判断抖动，不代表已通过真实校园验收。以上演示使用历史增长前缀预测，不是下方新增的固定窗口告警；两者结果不可互换。
 
 素材来自 [UR Fall Detection Dataset](https://fenix.ur.edu.pl/mkepski/ds/uf.html)（University of Rzeszów / Michał Kępski），使用 fall-06、adl-10 的 cam0 RGB 序列。本项目添加了姿态、分数和中文说明；视频及动图沿用 [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)，用于非商用学术演示。引用：Bogdan Kwolek、Michal Kepski，*Human fall detection on embedded platform using depth maps and wireless accelerometer*，2014，117(3)，489–501。原作者不为本项目效果背书。
 
@@ -43,20 +47,27 @@ FramePacket → Detections → Tracks → EventRecord → SQLite Outbox → Dest
 - TOML 驱动的事件、模型、运行时和投递配置，以及固定 split 的模型评估报告。
 - EasyAIoT `/alert/hook` adapter：保留本项目 `EventRecord`，转换为 EasyAIoT 告警字段并通过 SQLite Outbox 投递；鉴权 token 只从环境变量读取。
 
-当前边界：本地 MP4、三种 PC 模型运行时、ByteTrack adapter 和本地证据已跑通；RTSP adapter 已实现但尚未用真实摄像头长稳验收。OpenRemote/MQTT、RKNN/昇腾板卡、校园数据精度和证据保留策略仍未验证。这些属于后续门禁，不能把本骨架当成已部署系统。
+当前边界：本地 MP4、三种 PC 模型运行时、ByteTrack adapter 和本地证据已跑通；跌倒入口已有 RTSP 重连、积压/磁盘保护与证据隔离，但尚未真实摄像头长稳验收。OpenRemote/MQTT、RKNN/昇腾板卡、校园数据精度与真实平台仍待验证。这些属于后续门禁，不能把本骨架当成已部署系统。
 
 ## 本轮整改（2026-09-14）
 
 详细任务、优先级、架构、平台整合步骤和验收矩阵见 [整改方案](docs/REMEDIATION-PLAN-2026-09-14.md)，视频逐文件处理记录见 [清理清单](docs/audits/2026-09-14/video-cleanup.json)。
 
-打架视频 CLI 现在逐窗口写观测、提交事件，不再等视频结束后统一交付，也不保留完整结果列表。Python 离线调用仍可使用 `FightVideoPipeline.run()` 汇总有限视频；持续源使用 `stream()`。正常 EOF 会产生必要的 END 记录。EasyAIoT 视频入口已使用独立后台交付：分析先本地入队，网络失败自动退避重试，重启可补传。RTSP 自动重连仍待实施，详见方案。
+打架视频 CLI 现在逐窗口写观测、提交事件，不再等视频结束后统一交付，也不保留完整结果列表。Python 离线调用仍可使用 `FightVideoPipeline.run()` 汇总有限视频；持续源使用 `stream()`。正常 EOF 会产生必要的 END 记录。EasyAIoT 视频入口已使用独立后台交付：分析先本地入队，网络失败自动退避重试，重启可补传。打架入口的 RTSP 自动重连仍待实施；2026-09-23 新增重连能力目前接入跌倒入口。
 
 ## 立即运行
+
+2026-09-23 已完成固定窗口跌倒候选训练、一次保留人物测试，以及连续告警、RTSP 重连、积压/磁盘保护和拒绝事件恢复。新候选在 5 段、38.4 秒保留测试中检出唯一一次跌倒，误报从原方案的 5 次降至 1 次，但仍误报俯卧撑，尚不替换默认模型。完整结果、运行命令与验收边界见 [最新推进记录](docs/training/project-progress-2026-09-23.md)；早期工程回放见 [首轮记录](docs/training/fall-streaming-2026-09-23.md)，事件含义见 [跌倒事件规范](docs/event-specs/fall-v1.md)。
+
+网上首批补充素材：23 段原视频、2 组原始帧序列，约 358 MB，来源和文件清单见 [素材交付](docs/research/web-hard-negatives-2026-09-23.md)。GMD 视频已复核标注并按来源人物分为 12/6/5 段训练/验证/测试；UP 两组仅诊断。原有数据划分与模型保留。
 
 项目本身只需要 Python 3.11+：
 
 ```bash
-PYTHONPATH=src python3 -m unittest discover -s tests -v
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -e '.[dev]'
+python -m pytest -q
 PYTHONPATH=src python3 -m campus_safety_ai.apps.fake_chain
 PYTHONPATH=src python3 -m campus_safety_ai.apps.offline_replay \
   --input tests/golden/intrusion/detections.jsonl \
@@ -67,6 +78,8 @@ PYTHONPATH=src python3 -m campus_safety_ai.apps.fight_replay \
 ```
 
 演示会在 `runtime/` 创建 SQLite Outbox 和 JSONL 事件文件。该目录不提交 Git。
+
+上述最小安装会跳过需要视觉或训练依赖的测试；真实视频另安装 `.[vision]`，训练另安装 `.[training]`。核心运行包本身没有必需第三方依赖。演示渲染另需 `.[demos]`、系统 `ffmpeg` / `ffprobe` 及中文字体。模型权重、原始视频、训练缓存与本机运行报告需按各模块说明单独准备。
 
 ## 跑本地视频打架识别
 
@@ -173,7 +186,7 @@ PYTHONPATH=src .venv/bin/python -m campus_safety_ai.apps.offline_replay \
 
 已训练仅使用人体运动特征的分类头，并补齐 8 段训练视频的 1302 张连续原帧。同一段走路验证录像的误报时点从 80/285 降为 0/285；跌倒验证片段仍可识别，但早期分数有抖动。整段复用 test 为 14/14 正确，不能作为新的独立实时验收证据。
 
-权重、完整失败对照、连续识别结果与复现命令见 [姿态运动训练报告](docs/training/fall-pose-motion-2026-09-21.md)。目前为研究候选模型，尚未接入常驻告警，也未验证校园泛化。
+权重记录、完整失败对照、连续识别结果与复现命令见 [姿态运动训练报告](docs/training/fall-pose-motion-2026-09-21.md)。该历史候选当时未接入常驻告警；2026-09-23 已新增固定窗口持续告警入口，当前状态见 [最新推进记录](docs/training/project-progress-2026-09-23.md)，校园泛化仍待验证。
 
 ## 跌倒分类训练（URFD 历史 RGB 基线）
 

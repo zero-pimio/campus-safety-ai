@@ -32,6 +32,7 @@ training = [
     "onnxruntime>=1.20,<2",
 ]
 dev = ["pytest", "ruff>=0.6"]
+demos = ["pillow>=10,<13"]
 
 [tool.ruff]
 target-version = "py311"
@@ -52,6 +53,11 @@ campus-safety-build-fight-manifest = "campus_safety_ai.apps.build_fight_manifest
 campus-safety-train-fight = "campus_safety_ai.apps.train_fight:main"
 campus-safety-export-fight-onnx = "campus_safety_ai.apps.export_fight_onnx:main"
 campus-safety-evaluate-fight = "campus_safety_ai.apps.evaluate_fight:main"
+campus-safety-fall-video = "campus_safety_ai.apps.fall_video:main"
+campus-safety-evaluate-fall = "campus_safety_ai.apps.evaluate_fall:main"
+campus-safety-audit-continuous-manifest = "campus_safety_ai.apps.audit_continuous_manifest:main"
+campus-safety-maintain-runtime = "campus_safety_ai.apps.maintain_runtime:main"
+campus-safety-recover-events = "campus_safety_ai.apps.recover_events:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -1,7 +1,12 @@
 import io
 import unittest
 
-import numpy as np
+try:
+    import numpy as np
+except ModuleNotFoundError as error:
+    if error.name != "numpy":
+        raise
+    raise unittest.SkipTest("optional numpy dependency is not installed") from error
 
 try:
     import torch

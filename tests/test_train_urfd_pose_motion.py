@@ -6,8 +6,13 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-import numpy as np
-import torch
+try:
+    import numpy as np
+    import torch
+except ModuleNotFoundError as error:
+    if error.name not in {"numpy", "torch"}:
+        raise
+    raise unittest.SkipTest(f"optional {error.name} dependency is not installed") from error
 
 SPEC = importlib.util.spec_from_file_location("train_urfd_pose_motion", Path(__file__).resolve().parents[1]
                                              / "scripts/train_urfd_pose_motion.py")

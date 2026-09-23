@@ -1,0 +1,437 @@
+{
+  "date": "2026-09-23",
+  "scope": "Local engineering validation; no new training or independent accuracy/RTSP/RK3588 acceptance.",
+  "runs": {
+    "final-adl-10": {
+      "status": "completed",
+      "camera_id": "urfd-adl10",
+      "source_epoch": 1,
+      "started_at": "2026-09-23T00:00:00Z",
+      "processed_frames": 300,
+      "observations": 82,
+      "unknown_observations": 14,
+      "starts": 1,
+      "ends": 1,
+      "open_events_at_exit": 0,
+      "checkpoint_sha256": "3ae4b6237f16f6c377f118fc1c0b69e9d069765e8d61f13b351e5403d1f1b368",
+      "model_version": "pose-motion-3ae4b6237f16f6c3",
+      "event_config_sha256": "8d81caffa5f1f9ed35c5efb37c448b5e0faa501168de17073aaa3f5000a6ae1f",
+      "event_policy": {
+        "edge_id": "edge-dev-01",
+        "start_score": 0.5,
+        "end_score": 0.35,
+        "confirm_seconds": 0.3,
+        "clear_seconds": 1.0,
+        "cooldown_seconds": 2.0,
+        "max_observation_gap_seconds": 1.0,
+        "config_version": "fall-v1",
+        "event_type": "person_falling",
+        "max_cameras": 256,
+        "max_evidence_uris": 8
+      },
+      "window": {
+        "window_seconds": 1,
+        "stride_seconds": 0.1,
+        "sample_count": 16,
+        "max_frame_gap_seconds": 0.3,
+        "max_buffer_frames": 256
+      },
+      "source": "runtime/training/urfd-pose-continuous-v1/adl-10.json",
+      "source_kind": "verified_pose_cache",
+      "evidence_errors": [],
+      "outbox": "runtime/checks/fall-stream-20260923/final-adl-10/outbox.sqlite3",
+      "scope": "Engineering replay; existing model on new fixed windows. No event accuracy claim without truth. END means observed motion cleared or source/track closed, never verified human recovery.",
+      "timestamp_basis": "official cache timestamps relative to first frame",
+      "elapsed_seconds": 0.11038137506693602,
+      "pending_at_source_end": 0,
+      "events": [
+        {
+          "schemaVersion": "1.0",
+          "eventId": "5aba5f64-7b6d-5f06-b2ec-8b5b22e7c75a",
+          "revision": 1,
+          "phase": "START",
+          "eventType": "person_falling",
+          "severity": "critical",
+          "edgeId": "edge-dev-01",
+          "cameraId": "urfd-adl10",
+          "startedAt": "2026-09-23T00:00:06.770000Z",
+          "observedAt": "2026-09-23T00:00:07.129000Z",
+          "endedAt": null,
+          "subjectTrackKeys": [
+            "urfd-adl10:1:pose-1"
+          ],
+          "confidence": 0.9699140191078186,
+          "modelVersion": "pose-motion-3ae4b6237f16f6c3",
+          "configVersion": "fall-v1",
+          "idempotencyKey": "5aba5f64-7b6d-5f06-b2ec-8b5b22e7c75a:1",
+          "status": "OPEN",
+          "evidenceUris": [],
+          "sourceEpoch": 1,
+          "reason": "confirmed"
+        },
+        {
+          "schemaVersion": "1.0",
+          "eventId": "5aba5f64-7b6d-5f06-b2ec-8b5b22e7c75a",
+          "revision": 2,
+          "phase": "END",
+          "eventType": "person_falling",
+          "severity": "critical",
+          "edgeId": "edge-dev-01",
+          "cameraId": "urfd-adl10",
+          "startedAt": "2026-09-23T00:00:06.770000Z",
+          "observedAt": "2026-09-23T00:00:09.594000Z",
+          "endedAt": "2026-09-23T00:00:09.594000Z",
+          "subjectTrackKeys": [
+            "urfd-adl10:1:pose-1"
+          ],
+          "confidence": 0.09741490334272385,
+          "modelVersion": "pose-motion-3ae4b6237f16f6c3",
+          "configVersion": "fall-v1",
+          "idempotencyKey": "5aba5f64-7b6d-5f06-b2ec-8b5b22e7c75a:2",
+          "status": "CLOSED",
+          "evidenceUris": [],
+          "sourceEpoch": 1,
+          "reason": "motion_cleared"
+        }
+      ],
+      "evaluation": {
+        "metrics": {
+          "ground_truth_event_count": 0,
+          "alarm_count": 1,
+          "true_positives": 0,
+          "false_positives": 1,
+          "false_negatives": 0,
+          "precision": 0.0,
+          "recall": null,
+          "miss_rate": null,
+          "false_alarms_per_hour": 361.1556982343499,
+          "false_alarms_per_hour_denominator": "all explicitly annotated camera-session hours",
+          "annotated_hours": 0.002768888888888889,
+          "normal_hours": 0.002768888888888889,
+          "delay_seconds": {
+            "count": 0,
+            "mean": null,
+            "median": null,
+            "min": null,
+            "max": null,
+            "definition": "START observedAt minus truth startedAt; negative allowed only with tolerance"
+          }
+        },
+        "coverage": {
+          "max_observation_gap_seconds": 2.0,
+          "rule": "earlier observation state until next row when gap <= max; no leading/trailing extrapolation",
+          "fraction_denominator": "all explicitly annotated camera-session seconds",
+          "known_observation_count": 68,
+          "unknown_observation_count": 14,
+          "annotated_seconds": 9.968,
+          "known_seconds": 8.299,
+          "unknown_seconds": 1.669,
+          "unobserved_seconds": 4.440892098500626e-16,
+          "known_fraction": 0.8325642054574638,
+          "unknown_fraction": 0.16743579454253613,
+          "unobserved_fraction": 0.0,
+          "complete": true,
+          "sessions": [
+            {
+              "camera_id": "urfd-adl10",
+              "source_epoch": 1,
+              "started_at": "2026-09-23T00:00:00Z",
+              "ended_at": "2026-09-23T00:00:09.968000Z",
+              "annotated_seconds": 9.968,
+              "known_seconds": 8.299,
+              "unknown_seconds": 1.669,
+              "unobserved_seconds": 4.440892098500626e-16,
+              "observation_count": 82
+            }
+          ]
+        }
+      }
+    },
+    "single-person-adl-10": {
+      "status": "completed",
+      "camera_id": "urfd-adl10",
+      "source_epoch": 1,
+      "started_at": "2026-09-23T00:00:00Z",
+      "processed_frames": 300,
+      "observations": 94,
+      "unknown_observations": 41,
+      "starts": 0,
+      "ends": 0,
+      "open_events_at_exit": 0,
+      "checkpoint_sha256": "3ae4b6237f16f6c377f118fc1c0b69e9d069765e8d61f13b351e5403d1f1b368",
+      "model_version": "pose-motion-3ae4b6237f16f6c3",
+      "event_config_sha256": "8d81caffa5f1f9ed35c5efb37c448b5e0faa501168de17073aaa3f5000a6ae1f",
+      "event_policy": {
+        "edge_id": "edge-dev-01",
+        "start_score": 0.5,
+        "end_score": 0.35,
+        "confirm_seconds": 0.3,
+        "clear_seconds": 1.0,
+        "cooldown_seconds": 2.0,
+        "max_observation_gap_seconds": 1.0,
+        "config_version": "fall-v1",
+        "event_type": "person_falling",
+        "max_cameras": 256,
+        "max_evidence_uris": 8
+      },
+      "window": {
+        "window_seconds": 1,
+        "stride_seconds": 0.1,
+        "sample_count": 16,
+        "max_frame_gap_seconds": 0.3,
+        "max_buffer_frames": 256
+      },
+      "source": "runtime/training/urfd-pose-continuous-v1/adl-10.json",
+      "source_kind": "verified_pose_cache",
+      "evidence_errors": [],
+      "outbox": "runtime/checks/fall-stream-20260923/single-person-adl-10/outbox.sqlite3",
+      "scope": "Engineering replay; existing model on new fixed windows. No event accuracy claim without truth. END means observed motion cleared or source/track closed, never verified human recovery.",
+      "timestamp_basis": "official cache timestamps relative to first frame",
+      "elapsed_seconds": 0.0802121248561889,
+      "pending_at_source_end": 0,
+      "events": [],
+      "evaluation": {
+        "metrics": {
+          "ground_truth_event_count": 0,
+          "alarm_count": 0,
+          "true_positives": 0,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "precision": null,
+          "recall": null,
+          "miss_rate": null,
+          "false_alarms_per_hour": 0.0,
+          "false_alarms_per_hour_denominator": "all explicitly annotated camera-session hours",
+          "annotated_hours": 0.002768888888888889,
+          "normal_hours": 0.002768888888888889,
+          "delay_seconds": {
+            "count": 0,
+            "mean": null,
+            "median": null,
+            "min": null,
+            "max": null,
+            "definition": "START observedAt minus truth startedAt; negative allowed only with tolerance"
+          }
+        },
+        "coverage": {
+          "max_observation_gap_seconds": 2.0,
+          "rule": "earlier observation state until next row when gap <= max; no leading/trailing extrapolation",
+          "fraction_denominator": "all explicitly annotated camera-session seconds",
+          "known_observation_count": 53,
+          "unknown_observation_count": 41,
+          "annotated_seconds": 9.968,
+          "known_seconds": 6.456999999999999,
+          "unknown_seconds": 3.511,
+          "unobserved_seconds": 8.881784197001252e-16,
+          "known_fraction": 0.6477728731942214,
+          "unknown_fraction": 0.3522271268057785,
+          "unobserved_fraction": 0.0,
+          "complete": true,
+          "sessions": [
+            {
+              "camera_id": "urfd-adl10",
+              "source_epoch": 1,
+              "started_at": "2026-09-23T00:00:00Z",
+              "ended_at": "2026-09-23T00:00:09.968000Z",
+              "annotated_seconds": 9.968,
+              "known_seconds": 6.456999999999999,
+              "unknown_seconds": 3.511,
+              "unobserved_seconds": 8.881784197001252e-16,
+              "observation_count": 94
+            }
+          ]
+        }
+      }
+    },
+    "single-person-fall-06": {
+      "status": "completed",
+      "camera_id": "urfd-fall06",
+      "source_epoch": 1,
+      "started_at": "2026-09-23T00:00:00Z",
+      "processed_frames": 100,
+      "observations": 34,
+      "unknown_observations": 21,
+      "starts": 1,
+      "ends": 1,
+      "open_events_at_exit": 0,
+      "checkpoint_sha256": "3ae4b6237f16f6c377f118fc1c0b69e9d069765e8d61f13b351e5403d1f1b368",
+      "model_version": "pose-motion-3ae4b6237f16f6c3",
+      "event_config_sha256": "8d81caffa5f1f9ed35c5efb37c448b5e0faa501168de17073aaa3f5000a6ae1f",
+      "event_policy": {
+        "edge_id": "edge-dev-01",
+        "start_score": 0.5,
+        "end_score": 0.35,
+        "confirm_seconds": 0.3,
+        "clear_seconds": 1.0,
+        "cooldown_seconds": 2.0,
+        "max_observation_gap_seconds": 1.0,
+        "config_version": "fall-v1",
+        "event_type": "person_falling",
+        "max_cameras": 256,
+        "max_evidence_uris": 8
+      },
+      "window": {
+        "window_seconds": 1,
+        "stride_seconds": 0.1,
+        "sample_count": 16,
+        "max_frame_gap_seconds": 0.3,
+        "max_buffer_frames": 256
+      },
+      "source": "runtime/training/urfd-pose-continuous-v1/fall-06.json",
+      "source_kind": "verified_pose_cache",
+      "evidence_errors": [],
+      "outbox": "runtime/checks/fall-stream-20260923/single-person-fall-06/outbox.sqlite3",
+      "scope": "Engineering replay; existing model on new fixed windows. No event accuracy claim without truth. END means observed motion cleared or source/track closed, never verified human recovery.",
+      "timestamp_basis": "official cache timestamps relative to first frame",
+      "elapsed_seconds": 0.04937016707845032,
+      "pending_at_source_end": 0,
+      "events": [
+        {
+          "schemaVersion": "1.0",
+          "eventId": "54587cde-95e3-5593-b712-ea52ba563563",
+          "revision": 1,
+          "phase": "START",
+          "eventType": "person_falling",
+          "severity": "critical",
+          "edgeId": "edge-dev-01",
+          "cameraId": "urfd-fall06",
+          "startedAt": "2026-09-23T00:00:01.001000Z",
+          "observedAt": "2026-09-23T00:00:01.301000Z",
+          "endedAt": null,
+          "subjectTrackKeys": [
+            "urfd-fall06:1:pose-1"
+          ],
+          "confidence": 0.9974275231361389,
+          "modelVersion": "pose-motion-3ae4b6237f16f6c3",
+          "configVersion": "fall-v1",
+          "idempotencyKey": "54587cde-95e3-5593-b712-ea52ba563563:1",
+          "status": "OPEN",
+          "evidenceUris": [],
+          "sourceEpoch": 1,
+          "reason": "confirmed"
+        },
+        {
+          "schemaVersion": "1.0",
+          "eventId": "54587cde-95e3-5593-b712-ea52ba563563",
+          "revision": 2,
+          "phase": "END",
+          "eventType": "person_falling",
+          "severity": "critical",
+          "edgeId": "edge-dev-01",
+          "cameraId": "urfd-fall06",
+          "startedAt": "2026-09-23T00:00:01.001000Z",
+          "observedAt": "2026-09-23T00:00:01.935000Z",
+          "endedAt": "2026-09-23T00:00:01.935000Z",
+          "subjectTrackKeys": [
+            "urfd-fall06:1:pose-1"
+          ],
+          "confidence": 0.9999988079071045,
+          "modelVersion": "pose-motion-3ae4b6237f16f6c3",
+          "configVersion": "fall-v1",
+          "idempotencyKey": "54587cde-95e3-5593-b712-ea52ba563563:2",
+          "status": "CLOSED",
+          "evidenceUris": [],
+          "sourceEpoch": 1,
+          "reason": "track_changed"
+        }
+      ]
+    },
+    "video-fall06": {
+      "status": "completed",
+      "camera_id": "video-fall06",
+      "source_epoch": 1,
+      "started_at": "2026-09-23T00:00:00Z",
+      "processed_frames": 100,
+      "observations": 35,
+      "unknown_observations": 21,
+      "starts": 1,
+      "ends": 1,
+      "open_events_at_exit": 0,
+      "checkpoint_sha256": "3ae4b6237f16f6c377f118fc1c0b69e9d069765e8d61f13b351e5403d1f1b368",
+      "model_version": "pose-motion-3ae4b6237f16f6c3",
+      "event_config_sha256": "8d81caffa5f1f9ed35c5efb37c448b5e0faa501168de17073aaa3f5000a6ae1f",
+      "event_policy": {
+        "edge_id": "edge-dev-01",
+        "start_score": 0.5,
+        "end_score": 0.35,
+        "confirm_seconds": 0.3,
+        "clear_seconds": 1.0,
+        "cooldown_seconds": 2.0,
+        "max_observation_gap_seconds": 1.0,
+        "config_version": "fall-v1",
+        "event_type": "person_falling",
+        "max_cameras": 256,
+        "max_evidence_uris": 8
+      },
+      "window": {
+        "window_seconds": 1,
+        "stride_seconds": 0.1,
+        "sample_count": 16,
+        "max_frame_gap_seconds": 0.3,
+        "max_buffer_frames": 256
+      },
+      "source": "runtime/checks/fall-stream-20260923/fall06-original-frames-cfr.mp4",
+      "source_kind": "local_video",
+      "evidence_errors": [],
+      "outbox": "runtime/checks/fall-stream-20260923/video-fall06/outbox.sqlite3",
+      "scope": "Engineering replay; existing model on new fixed windows. No event accuracy claim without truth. END means observed motion cleared or source/track closed, never verified human recovery.",
+      "timestamp_basis": "CFR frame index / FPS; variable-frame-rate sources require an exact-timestamp adapter",
+      "elapsed_seconds": 6.40995387500152,
+      "pending_at_source_end": 0,
+      "events": [
+        {
+          "schemaVersion": "1.0",
+          "eventId": "c7dae45f-2b84-5a39-97b5-b5f901e23282",
+          "revision": 1,
+          "phase": "START",
+          "eventType": "person_falling",
+          "severity": "critical",
+          "edgeId": "edge-dev-01",
+          "cameraId": "video-fall06",
+          "startedAt": "2026-09-23T00:00:01Z",
+          "observedAt": "2026-09-23T00:00:01.300000Z",
+          "endedAt": null,
+          "subjectTrackKeys": [
+            "video-fall06:1:pose-1"
+          ],
+          "confidence": 0.9954226613044739,
+          "modelVersion": "pose-motion-3ae4b6237f16f6c3",
+          "configVersion": "fall-v1",
+          "idempotencyKey": "c7dae45f-2b84-5a39-97b5-b5f901e23282:1",
+          "status": "OPEN",
+          "evidenceUris": [
+            "runtime/checks/fall-stream-20260923/video-fall06/evidence/c7dae45f-2b84-5a39-97b5-b5f901e23282.jpg"
+          ],
+          "sourceEpoch": 1,
+          "reason": "confirmed"
+        },
+        {
+          "schemaVersion": "1.0",
+          "eventId": "c7dae45f-2b84-5a39-97b5-b5f901e23282",
+          "revision": 2,
+          "phase": "END",
+          "eventType": "person_falling",
+          "severity": "critical",
+          "edgeId": "edge-dev-01",
+          "cameraId": "video-fall06",
+          "startedAt": "2026-09-23T00:00:01Z",
+          "observedAt": "2026-09-23T00:00:02.200000Z",
+          "endedAt": "2026-09-23T00:00:02.200000Z",
+          "subjectTrackKeys": [
+            "video-fall06:1:pose-1"
+          ],
+          "confidence": 0.9999232292175293,
+          "modelVersion": "pose-motion-3ae4b6237f16f6c3",
+          "configVersion": "fall-v1",
+          "idempotencyKey": "c7dae45f-2b84-5a39-97b5-b5f901e23282:2",
+          "status": "CLOSED",
+          "evidenceUris": [
+            "runtime/checks/fall-stream-20260923/video-fall06/evidence/c7dae45f-2b84-5a39-97b5-b5f901e23282.jpg"
+          ],
+          "sourceEpoch": 1,
+          "reason": "track_changed"
+        }
+      ]
+    }
+  }
+}

@@ -16,8 +16,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Install package and test runner
+        run: python -m pip install -e . pytest
       - name: Run contract, analysis, and replay tests
-        run: PYTHONPATH=src python3 -m unittest discover -s tests -v
+        run: python -m pytest -q
 
   lint:
     runs-on: ubuntu-latest

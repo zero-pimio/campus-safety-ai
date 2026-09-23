@@ -16,3 +16,6 @@ models/*.om
 models/ppTSM/
 datasets/private/
 datasets/samples/*.mp4
+.env
+.env.*
+!.env.example

@@ -5,7 +5,13 @@ import tempfile
 import unittest
 from pathlib import Path
 
-import numpy as np
+try:
+    import numpy as np
+    import torch  # noqa: F401 - the loaded training script requires torch
+except ModuleNotFoundError as error:
+    if error.name not in {"numpy", "torch"}:
+        raise
+    raise unittest.SkipTest(f"optional {error.name} dependency is not installed") from error
 
 SPEC = importlib.util.spec_from_file_location("train_urfd_pose_prefix", Path(__file__).resolve().parents[1]
                                              / "scripts/train_urfd_pose_prefix.py")

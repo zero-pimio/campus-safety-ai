@@ -14,13 +14,28 @@ from campus_safety_ai.contracts import EventRecord
 from campus_safety_ai.core.outbox_lease import OutboxLease
 
 
+def _file_bytes(paths: list[Path]) -> int:
+    total = 0
+    for path in paths:
+        try:
+            total += path.stat().st_size
+        except FileNotFoundError:
+            # A concurrent WAL checkpoint/connection close can remove sidecars.
+            pass
+    return total
+
+
 def read_outbox_status(connection: sqlite3.Connection, now: float | None = None) -> dict:
     """Read a consistent queue snapshot without migrating or writing the database."""
     columns = {row[1] for row in connection.execute("PRAGMA table_info(outbox)")}
     if "attempts" not in columns:
         pending = connection.execute("SELECT COUNT(*) FROM outbox WHERE delivered=0").fetchone()[0]
         return {"pending": pending, "schema": "legacy"}
+    cutoff = time.time() if now is None else now
+    if not math.isfinite(cutoff):
+        raise ValueError("now must be finite")
     partition = "AND prior.event_id = current.event_id" if "event_id" in columns else ""
+    queued_at = "enqueued_at" if "enqueued_at" in columns else "NULL"
     row = connection.execute(f"""
         WITH heads AS (
             SELECT current.next_attempt_at FROM outbox AS current
@@ -30,7 +45,12 @@ def read_outbox_status(connection: sqlite3.Connection, now: float | None = None)
             )
         ), totals AS (
             SELECT COUNT(CASE WHEN delivered=0 THEN 1 END) AS pending,
-                   COALESCE(SUM(attempts), 0) AS attempts FROM outbox
+                   COALESCE(SUM(attempts), 0) AS attempts,
+                   COALESCE(SUM(CASE WHEN delivered=0 THEN length(CAST(payload AS BLOB)) END), 0) AS bytes,
+                   MIN(CASE WHEN delivered=0 THEN {queued_at} END) AS oldest,
+                   COUNT(CASE WHEN delivered=0 AND {queued_at} IS NULL THEN 1 END) AS unknown_age,
+                   COUNT(*) AS records,
+                   COALESCE(SUM(length(CAST(payload AS BLOB))), 0) AS all_bytes FROM outbox
         ), scheduling AS (
             SELECT COUNT(*) AS count, COALESCE(SUM(next_attempt_at <= ?), 0) AS ready,
                    MIN(next_attempt_at) AS next FROM heads
@@ -39,9 +59,10 @@ def read_outbox_status(connection: sqlite3.Connection, now: float | None = None)
             FROM outbox WHERE delivered=0 ORDER BY rowid LIMIT 1
         )
         SELECT totals.pending, totals.attempts, scheduling.count, scheduling.ready, scheduling.next,
-               first.idempotency_key, first.attempts, first.next_attempt_at, first.last_error
+               first.idempotency_key, first.attempts, first.next_attempt_at, first.last_error,
+               totals.bytes, totals.oldest, totals.unknown_age, totals.records, totals.all_bytes
         FROM totals CROSS JOIN scheduling LEFT JOIN first ON 1=1
-    """, (time.time() if now is None else now,)).fetchone()
+    """, (cutoff,)).fetchone()
     status = {
         "pending": row[0], "totalAttempts": row[1], "readyEvents": row[3],
         "deferredEvents": row[2] - row[3], "blockedRecords": row[0] - row[2],
@@ -50,7 +71,15 @@ def read_outbox_status(connection: sqlite3.Connection, now: float | None = None)
             "idempotencyKey": row[5], "attempts": row[6],
             "nextAttemptAt": row[7], "errorType": row[8],
         },
+        "pendingBytes": row[9], "oldestPendingAt": row[10],
+        "oldestPendingAgeSeconds": None if row[10] is None else max(0.0, cutoff - row[10]),
+        "unknownPendingAgeRecords": row[11], "totalRecords": row[12], "payloadBytes": row[13],
     }
+    # Payload limits do not bound SQLite indexes, delivered history, or the WAL.
+    paths = [Path(item[2]) for item in connection.execute("PRAGMA database_list") if item[1] == "main" and item[2]]
+    status["databaseBytes"] = _file_bytes(paths)
+    status["databaseAuxiliaryBytes"] = _file_bytes(
+        [Path(str(path) + suffix) for path in paths for suffix in ("-wal", "-shm")])
     if "event_id" not in columns:
         status["schema"] = "fifo"
     return status
@@ -79,13 +108,39 @@ class JsonlDestination:
             handle.write(json.dumps(record, ensure_ascii=False, separators=(",", ":")) + "\n")
 
 
+class OutboxCapacityError(RuntimeError):
+    """No new records in this batch were persisted; stop/retry the producer."""
+
+    def __init__(self, *, pending_records: int, pending_bytes: int, incoming_records: int,
+                 incoming_bytes: int, max_pending_records: int | None, max_pending_bytes: int | None):
+        self.pending_records = pending_records
+        self.pending_bytes = pending_bytes
+        self.incoming_records = incoming_records
+        self.incoming_bytes = incoming_bytes
+        self.max_pending_records = max_pending_records
+        self.max_pending_bytes = max_pending_bytes
+        super().__init__(
+            "outbox capacity exceeded; entire new batch remains unsubmitted: "
+            f"pending={pending_records} records/{pending_bytes} bytes, "
+            f"incoming={incoming_records} records/{incoming_bytes} bytes, "
+            f"limits={max_pending_records} records/{max_pending_bytes} bytes; "
+            "stop inference and retain/retry the rejected records"
+        )
+
+
 class EventDelivery:
     """Persistent at-least-once delivery with idempotent enqueue."""
 
     flush_chunk = 200
 
     def __init__(self, database: Path, destination: Destination, *,
+                 max_pending_records: int | None = None, max_pending_bytes: int | None = None,
                  _lease: OutboxLease | None = None) -> None:
+        for value in (max_pending_records, max_pending_bytes):
+            if value is not None and (isinstance(value, bool) or not isinstance(value, int) or value < 1):
+                raise ValueError("outbox limits must be positive integers or None")
+        self.max_pending_records = max_pending_records
+        self.max_pending_bytes = max_pending_bytes
         database = database.resolve()
         database.parent.mkdir(parents=True, exist_ok=True)
         self.database = database
@@ -108,7 +163,9 @@ class EventDelivery:
                 attempts INTEGER NOT NULL DEFAULT 0,
                 next_attempt_at REAL NOT NULL DEFAULT 0,
                 last_error TEXT,
-                event_id TEXT NOT NULL DEFAULT ''
+                event_id TEXT NOT NULL DEFAULT '',
+                enqueued_at REAL,
+                delivered_at REAL
             )
             """
         )
@@ -119,6 +176,8 @@ class EventDelivery:
             "next_attempt_at": "REAL NOT NULL DEFAULT 0",
             "last_error": "TEXT",
             "event_id": "TEXT NOT NULL DEFAULT ''",
+            "enqueued_at": "REAL",
+            "delivered_at": "REAL",
         }
         missing = additions.keys() - columns
         if missing:
@@ -164,16 +223,69 @@ class EventDelivery:
             finally:
                 lease.close()
 
-    def enqueue(self, records: list[EventRecord]) -> int:
-        """Persist locally without invoking the destination; return newly queued rows."""
-        before = self.connection.total_changes
+    def enqueue(self, records: list[EventRecord], *, require_matching_payload: bool = False,
+                require_contiguous_revisions: bool = False) -> int:
+        """Atomically persist a batch, or reject it without dropping existing records.
+
+        Existing idempotency keys (including delivered history) consume no capacity.
+        The write transaction serializes the capacity check across producers.
+        """
+        if not records:
+            return 0
+        unique = {}
+        for record in records:
+            if require_matching_payload and record.idempotency_key in unique:
+                if record.to_dict() != unique[record.idempotency_key].to_dict():
+                    raise ValueError("duplicate idempotency key has conflicting payloads in this batch")
+            unique.setdefault(record.idempotency_key, record)
         with self.connection:
-            for record in records:
-                self.connection.execute(
-                    "INSERT OR IGNORE INTO outbox(idempotency_key, payload, event_id) VALUES (?, ?, ?)",
-                    (record.idempotency_key, json.dumps(record.to_dict(), ensure_ascii=False), record.event_id),
+            self.connection.execute("BEGIN IMMEDIATE")
+            incoming = []
+            for key, record in unique.items():
+                existing = self.connection.execute("SELECT payload FROM outbox WHERE idempotency_key=?", (key,)).fetchone()
+                if existing:
+                    if require_matching_payload and json.dumps(json.loads(existing[0]), sort_keys=True) != json.dumps(
+                            record.to_dict(), sort_keys=True):
+                        raise ValueError("existing idempotency key has a conflicting payload")
+                    continue
+                incoming.append((key, json.dumps(record.to_dict(), ensure_ascii=False), record.event_id))
+            if not incoming:
+                return 0
+            if require_contiguous_revisions:
+                tips = {}
+                for key, _, event_id in incoming:
+                    if event_id not in tips:
+                        row = self.connection.execute(
+                            "SELECT payload FROM outbox WHERE event_id=? ORDER BY rowid DESC LIMIT 1",
+                            (event_id,),
+                        ).fetchone()
+                        tips[event_id] = EventRecord.from_dict(json.loads(row[0])) if row else None
+                    record, previous = unique[key], tips[event_id]
+                    if previous is None:
+                        if record.revision != 1 or record.phase != "START":
+                            raise ValueError("enqueue would omit the original event START")
+                    elif previous.phase == "END" or record.revision != previous.revision + 1:
+                        raise ValueError("enqueue would reorder an event revision")
+                    tips[event_id] = record
+            pending, pending_bytes = self.connection.execute(
+                "SELECT COUNT(*), COALESCE(SUM(length(CAST(payload AS BLOB))), 0) "
+                "FROM outbox WHERE delivered=0"
+            ).fetchone()
+            incoming_bytes = sum(len(item[1].encode("utf-8")) for item in incoming)
+            if ((self.max_pending_records is not None and pending + len(incoming) > self.max_pending_records)
+                    or (self.max_pending_bytes is not None and pending_bytes + incoming_bytes > self.max_pending_bytes)):
+                raise OutboxCapacityError(
+                    pending_records=pending, pending_bytes=pending_bytes, incoming_records=len(incoming),
+                    incoming_bytes=incoming_bytes, max_pending_records=self.max_pending_records,
+                    max_pending_bytes=self.max_pending_bytes,
                 )
-        return self.connection.total_changes - before
+            queued_at = time.time()
+            for key, payload, event_id in incoming:
+                self.connection.execute(
+                    "INSERT INTO outbox(idempotency_key, payload, event_id, enqueued_at) VALUES (?, ?, ?, ?)",
+                    (key, payload, event_id, queued_at),
+                )
+        return len(incoming)
 
     def submit(self, records: list[EventRecord]) -> int:
         self.enqueue(records)
@@ -206,7 +318,7 @@ class EventDelivery:
                 with self.connection:
                     self.connection.execute(
                         "UPDATE outbox SET delivered=1, attempts=attempts+1, next_attempt_at=0, "
-                        "last_error=NULL WHERE idempotency_key=?", (key,)
+                        "last_error=NULL, delivered_at=? WHERE idempotency_key=?", (time.time(), key)
                     )
                 delivered += 1
         return delivered
@@ -263,13 +375,15 @@ class EventDelivery:
             with self.connection:
                 self.connection.execute(
                     "UPDATE outbox SET delivered=1, attempts=attempts+1, "
-                    "next_attempt_at=0, last_error=NULL WHERE idempotency_key=?", (key,),
+                    "next_attempt_at=0, last_error=NULL, delivered_at=? WHERE idempotency_key=?",
+                    (time.time() if now is None else now, key),
                 )
             delivered += 1
         return delivered
 
     def retry_status(self) -> dict:
-        return read_outbox_status(self.connection)
+        return {**read_outbox_status(self.connection), "maxPendingRecords": self.max_pending_records,
+                "maxPendingBytes": self.max_pending_bytes}
 
     def pending_count(self) -> int:
         row = self.connection.execute("SELECT COUNT(*) FROM outbox WHERE delivered = 0").fetchone()

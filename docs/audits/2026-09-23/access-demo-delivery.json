@@ -1,0 +1,13 @@
+{
+  "status": "delivered_stage_demos",
+  "package": "runtime/demos/campus-safety-demos-20260923.zip",
+  "bytes": 14270294,
+  "sha256": "a597e289f05d572273156239a5c1612f72ce9e086d0ec68152853e31854667fa",
+  "media_count": 4,
+  "planned_modules": 6,
+  "full_module_acceptance_complete": false,
+  "browser_playback_verified": true,
+  "design_specs_reviewed": true,
+  "runtime_model_training_repeated": false,
+  "changes": "Access design, mandatory per-module demo delivery, current-stage gallery and new fixed-window fall rendering. No new access runtime/controller integration or field acceptance."
+}

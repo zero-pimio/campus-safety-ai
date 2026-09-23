@@ -1,0 +1,44 @@
+{
+  "retrieved_date": "2026-09-23",
+  "original_video_count": 23,
+  "original_rgb_sequence_count": 2,
+  "derived_mp4_count": 2,
+  "source_samples_total": 25,
+  "original_bytes_total": 358133117,
+  "coarse_negative_samples": 17,
+  "coarse_fall_samples": 8,
+  "training_performed": false,
+  "splits_assigned": false,
+  "annotation_status": "coarse source labels preserved; event boundaries and full visible-person IDs need review",
+  "sources": [
+    {
+      "dataset": "GMDCSA-24",
+      "inventory": "gmdcsa24/inventory.json",
+      "downloaded_samples": 23,
+      "designated_subject_ids": 4,
+      "verified_frames": 5100,
+      "source_url": "https://github.com/ekramalam/GMDCSA24-A-Dataset-for-Human-Fall-Detection-in-Videos",
+      "failed_downloads": 1
+    },
+    {
+      "dataset": "UP-Fall",
+      "inventory": "up-fall/manifest.json",
+      "downloaded_samples": 2,
+      "designated_subject_ids": 1,
+      "verified_frames": 376,
+      "source_url": "https://sites.google.com/up.edu.mx/har-up/"
+    },
+    {
+      "dataset": "TsetFall",
+      "inventory": "tsetfall/sources.json",
+      "downloaded_samples": 0,
+      "status": "access_key_required"
+    }
+  ],
+  "gaps": [
+    "play fighting",
+    "independent campus long recordings",
+    "precise fall and recovery event labels"
+  ],
+  "scope": "Original clips/sequences count, not independent actors/cameras or accepted training samples. Derived MP4s do not increase sample count."
+}
